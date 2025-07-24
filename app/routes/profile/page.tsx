@@ -20,22 +20,34 @@ import {
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { ArrowLeft, Upload, User, Mail, Calendar, Lock, Camera, CheckCircle, Eye, EyeOff } from "lucide-react"
 import axios from "axios"
-import { toast } from "sonner"
+import { toast, Toaster } from "sonner"
 import { useNavigate } from "react-router"
 import type { Route } from "./+types/page"
 import { getCurrentUser } from "../home/api"
 import { useAuthGuard } from "~/lib/auth-middleware"
 import { changePassword, updateUser, type changePasswordInput, type updateUserInput } from "./api"
 
+
+export async function clientLoader() {
+
+  const token = window.localStorage.getItem("token")
+    if (!token){
+      return null
+    }
+  const product = await getCurrentUser(token)
+  return product;
+}
+
+
 export function HydrateFallback() {
   return <div>Loading...</div>;
 }
 
-export default function EditProfilePage() {
+export default function EditProfilePage({loaderData}:Route.ComponentProps) {
   const { isAuthenticated } = useAuthGuard();
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isSuccess, setIsSuccess] = useState(false)
-  const [selectedImage, setSelectedImage] = useState<string>("/placeholder.svg?height=120&width=120")
+  const [currentFile, setCurrentFile] = useState<File>()
   const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false)
   const [isPasswordSubmitting, setIsPasswordSubmitting] = useState(false)
   const [isPasswordSuccess, setIsPasswordSuccess] = useState(false)
@@ -43,9 +55,10 @@ export default function EditProfilePage() {
   const [showNewPassword, setShowNewPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
 
+  let user = loaderData
+
   const navigate = useNavigate()
-  // Don't render if not authenticated
-  if (!isAuthenticated()) {
+  if (!isAuthenticated() || !user) {
     return null;
   }
 
@@ -55,11 +68,12 @@ export default function EditProfilePage() {
     formState: { errors: profileErrors },
   } = useForm<updateUserInput>({
     defaultValues: {
-      fullName: "John Doe",
-      email: "johndoe@example.com",
-      dateOfBirth: "1990-01-15",
+      fullName: user.fullName,
+      email: user.email,
+      dateOfBirth: user.dob,
     },
   })
+  const [selectedImage, setSelectedImage] = useState<string>(`${import.meta.env.VITE_BACKEND_URL}${user.imagePath}`)
 
   const {
     register: registerPassword,
@@ -69,11 +83,12 @@ export default function EditProfilePage() {
     reset: resetPassword,
   } = useForm<changePasswordInput>()
 
-  const newPassword = watchPassword("password")
+  const newPassword = watchPassword("newPassword")
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     if (file) {
+      setCurrentFile(file)
       const reader = new FileReader()
       reader.onload = (e) => {
         setSelectedImage(e.target?.result as string)
@@ -84,20 +99,26 @@ export default function EditProfilePage() {
 
   const onSubmitProfile = async (data: updateUserInput) => {
     setIsSubmitting(true)
-
+    
     const token = window.localStorage.getItem("token")
     if (!token){
       toast("Anda tidak diperbolehkan untuk memperbaharui profil anda")
       return
     }
     try {
-      await updateUser({data, token})
+      if (currentFile){
+        data.image = currentFile
+        await updateUser({data, token})
+        toast("Profil berhasil diperbaharui")
+      }
     } catch (error) {
       if (axios.isAxiosError(error)){
         toast("Profil gagal diperbaharui")
+        setIsSubmitting(false)
+        return
       }
     }    
-
+    
     setIsSubmitting(false)
     setIsSuccess(true)
 
@@ -116,9 +137,11 @@ export default function EditProfilePage() {
     }
     try {
       await changePassword({data, token})
+      toast("password berhasil diganti")
     } catch (error) {
       if (axios.isAxiosError(error)){
         toast("password gagal diganti")
+        return
       }
     }  
 
@@ -139,6 +162,8 @@ export default function EditProfilePage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
+      <Toaster />
+      
       <header className="bg-white border-b border-gray-200">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center h-16">
@@ -266,7 +291,6 @@ export default function EditProfilePage() {
                     {profileErrors.email && <p className="text-sm text-red-600">{profileErrors.email.message}</p>}
                   </div>
 
-                  {/* Date of Birth */}
                   <div className="space-y-2">
                     <Label htmlFor="dateOfBirth" className="flex items-center space-x-2">
                       <Calendar className="w-4 h-4" />
@@ -357,10 +381,10 @@ export default function EditProfilePage() {
                             id="currentPassword"
                             type={showCurrentPassword ? "text" : "password"}
                             placeholder="Enter current password"
-                            {...registerPassword("password", {
+                            {...registerPassword("currentPassword", {
                               required: "Current password is required",
                             })}
-                            className={passwordErrors.password ? "border-red-500 pr-10" : "pr-10"}
+                            className={passwordErrors.currentPassword ? "border-red-500 pr-10" : "pr-10"}
                           />
                           <Button
                             type="button"
@@ -372,31 +396,31 @@ export default function EditProfilePage() {
                             {showCurrentPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                           </Button>
                         </div>
-                        {passwordErrors.password && (
-                          <p className="text-sm text-red-600">{passwordErrors.password.message}</p>
+                        {passwordErrors.currentPassword && (
+                          <p className="text-sm text-red-600">{passwordErrors.currentPassword.message}</p>
                         )}
                       </div>
 
                       {/* New Password */}
                       <div className="space-y-2">
-                        <Label htmlFor="confirmPassword">New Password *</Label>
+                        <Label htmlFor="newPassword">New Password *</Label>
                         <div className="relative">
                           <Input
-                            id="confirmPassword"
+                            id="newPassword"
                             type={showNewPassword ? "text" : "password"}
                             placeholder="Enter new password"
-                            {...registerPassword("confirmPassword", {
+                            {...registerPassword("newPassword", {
                               required: "New password is required",
                               minLength: {
                                 value: 8,
                                 message: "Password must be at least 8 characters",
                               },
                               pattern: {
-                                value: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/,
-                                message: "Password must contain uppercase, lowercase, and number",
+                                value: /^(?=.*[A-Za-z])(?=.*\d)(?=.*[^A-Za-z\d])[A-Za-z\d\W_]+$/,
+                                message: "Password must contain alphabet, symbol, and number",
                               },
                             })}
-                            className={passwordErrors.confirmPassword ? "border-red-500 pr-10" : "pr-10"}
+                            className={passwordErrors.newPassword ? "border-red-500 pr-10" : "pr-10"}
                           />
                           <Button
                             type="button"
@@ -408,8 +432,8 @@ export default function EditProfilePage() {
                             {showNewPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                           </Button>
                         </div>
-                        {passwordErrors.confirmPassword && (
-                          <p className="text-sm text-red-600">{passwordErrors.confirmPassword.message}</p>
+                        {passwordErrors.newPassword && (
+                          <p className="text-sm text-red-600">{passwordErrors.newPassword.message}</p>
                         )}
                       </div>
 
@@ -423,7 +447,6 @@ export default function EditProfilePage() {
                             placeholder="Confirm new password"
                             {...registerPassword("confirmPassword", {
                               required: "Please confirm your password",
-                              validate: (value) => value === newPassword || "Passwords do not match",
                             })}
                             className={passwordErrors.confirmPassword ? "border-red-500 pr-10" : "pr-10"}
                           />

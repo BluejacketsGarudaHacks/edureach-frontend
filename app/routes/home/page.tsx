@@ -29,7 +29,9 @@ import type { User } from "~/interfaces/user";
 import type { Route } from "./+types/page";
 import { useAuthGuard } from "~/lib/auth-middleware";
 
-export default function HomePage({ loaderData }: Route.ComponentProps) {
+
+
+export default function HomePage() {
   const { isAuthenticated, logout } = useAuthGuard();
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [profilePicture, setProfilePicture] = useState("");
@@ -116,10 +118,12 @@ export default function HomePage({ loaderData }: Route.ComponentProps) {
               <Button variant="ghost" size="icon">
                 <Settings className="w-5 h-5" />
               </Button>
-              <Avatar className="w-8 h-8">
-                <AvatarImage src={profilePicture} />
-                <AvatarFallback>{avatarFallback}</AvatarFallback>
-              </Avatar>
+              <Link to="/profile">
+                <Avatar className="w-8 h-8">
+                  <AvatarImage src={profilePicture} />
+                  <AvatarFallback>{avatarFallback}</AvatarFallback>
+                </Avatar>
+              </Link>
               <Button variant="ghost" size="icon" onClick={logout}>
                 <LogOut className="w-5 h-5" />
               </Button>

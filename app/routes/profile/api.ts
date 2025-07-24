@@ -2,9 +2,10 @@ import z from "zod";
 import { api } from "~/util/apiClient";
 
 export const changePasswordInputSchema = z.object({
-    password: z.string().min(6, "Password harus lebih dari 6 karakter"),
+    currentPassword: z.string().min(8, "Password harus lebih dari 8 karakter"),
+    newPassword: z.string().min(8, "Password harus lebih dari 8 karakter"),
     confirmPassword: z.string(),
-}).refine((data) => data.password === data.confirmPassword, {
+}).refine((data) => data.newPassword === data.confirmPassword, {
   message: "Password tidak sama dengan password konfirmasi",
   path: ["confirmPassword"],
 });
@@ -29,6 +30,7 @@ export const updateUser = ({data, token}:{data:updateUserInput, token: string}) 
     formData.append("FirstName", data.fullName.split(' ')[0])
     formData.append("LastName", data.fullName.split(' ').length < 2 ? '': data.fullName.split(' ')[1])
     formData.append("DateOfBirth", data.dateOfBirth)
+    formData.append("Email", data.email)
     formData.append("Image", data.image)
 
     return api.put("user", formData, {
@@ -40,14 +42,11 @@ export const updateUser = ({data, token}:{data:updateUserInput, token: string}) 
 }
 
 export const changePassword = ({data, token}:{data:changePasswordInput, token: string}) => {
-    const formData = new FormData()
-
-    formData.append("Password", data.password)
-    formData.append("ConfirmPassword", data.confirmPassword)
-
-    return api.put("user", formData, {
+    return api.put("user/password", {
+        password: data.newPassword,
+        confirmPassword: data.confirmPassword
+    }, {
         headers: {
-            "Content-Type": "multipart/form-data",
             "Authorization": `Bearer ${token}`
         }
     })
