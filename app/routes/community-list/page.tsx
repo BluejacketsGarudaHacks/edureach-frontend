@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { ArrowLeft, Search, MapPin, Users, UserCheck, Plus, Grid3X3, List, BookOpen } from "lucide-react"
+import { useAuthGuard } from "~/lib/auth-middleware"
 
 interface Community {
   id: string
@@ -157,12 +158,18 @@ const sortOptions = [
 ]
 
 export default function CommunityListPage() {
+  const { isAuthenticated } = useAuthGuard();
   const [searchQuery, setSearchQuery] = useState("")
   const [selectedLocation, setSelectedLocation] = useState("All Cities")
   const [selectedCategory, setSelectedCategory] = useState("All Categories")
   const [sortBy, setSortBy] = useState("members")
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid")
   const [communities, setCommunities] = useState(mockCommunities)
+
+  // Don't render if not authenticated
+  if (!isAuthenticated()) {
+    return null;
+  }
 
   const filteredAndSortedCommunities = useMemo(() => {
     const filtered = communities.filter((community) => {

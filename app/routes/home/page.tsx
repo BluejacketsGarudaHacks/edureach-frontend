@@ -27,11 +27,18 @@ import { useEffect, useState } from "react";
 import { getCurrentUser } from "./api";
 import type { User } from "~/interfaces/user";
 import type { Route } from "./+types/page";
+import { useAuthGuard } from "~/lib/auth-middleware";
 
 export default function HomePage({ loaderData }: Route.ComponentProps) {
+  const { isAuthenticated, logout } = useAuthGuard();
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [profilePicture, setProfilePicture] = useState("");
   const [avatarFallback, setAvatarFallback] = useState("XX");
+
+  // Don't render if not authenticated
+  if (!isAuthenticated()) {
+    return null;
+  }
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -113,7 +120,7 @@ export default function HomePage({ loaderData }: Route.ComponentProps) {
                 <AvatarImage src={profilePicture} />
                 <AvatarFallback>{avatarFallback}</AvatarFallback>
               </Avatar>
-              <Button variant="ghost" size="icon">
+              <Button variant="ghost" size="icon" onClick={logout}>
                 <LogOut className="w-5 h-5" />
               </Button>
             </div>
