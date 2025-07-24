@@ -24,10 +24,11 @@ export function useAuthGuard() {
     return !!localStorage.getItem("token");
   };
 
-  // Logout function
+  // Logout function that also clears user data
   const logout = () => {
     if (typeof window !== "undefined") {
       localStorage.removeItem("token");
+      localStorage.removeItem("user");
       navigate("/auth/login", { replace: true });
     }
   };
@@ -61,6 +62,7 @@ export const authUtils = {
   logout: () => {
     if (typeof window !== "undefined") {
       localStorage.removeItem("token");
+      localStorage.removeItem("user");
       window.location.href = "/auth/login";
     }
   },
