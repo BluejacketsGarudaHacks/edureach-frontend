@@ -147,22 +147,6 @@ export default function HomePage({ loaderData }: Route.ComponentProps) {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm font-medium text-gray-600">
-                    Communities Joined
-                  </p>
-                  <p className="text-2xl font-bold text-gray-900">3</p>
-                </div>
-                <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
-                  <Users className="w-6 h-6 text-purple-600" />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-gray-600">
                     Documents Summarized
                   </p>
                   <p className="text-2xl font-bold text-gray-900">12</p>
@@ -179,6 +163,22 @@ export default function HomePage({ loaderData }: Route.ComponentProps) {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm font-medium text-gray-600">
+                    Communities Joined
+                  </p>
+                  <p className="text-2xl font-bold text-gray-900">3</p>
+                </div>
+                <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
+                  <Users className="w-6 h-6 text-purple-600" />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* <Card>
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-gray-600">
                     Learning Hours
                   </p>
                   <p className="text-2xl font-bold text-gray-900">24</p>
@@ -188,7 +188,7 @@ export default function HomePage({ loaderData }: Route.ComponentProps) {
                 </div>
               </div>
             </CardContent>
-          </Card>
+          </Card> */}
         </div>
 
         {/* Main Features */}
@@ -275,7 +275,7 @@ export default function HomePage({ loaderData }: Route.ComponentProps) {
           </Card>
 
           {/* Recent Activity */}
-          <Card>
+          {/* <Card>
             <CardHeader>
               <CardTitle className="text-xl font-bold">
                 Recent Activity
@@ -321,7 +321,7 @@ export default function HomePage({ loaderData }: Route.ComponentProps) {
                 </div>
               </div>
             </CardContent>
-          </Card>
+          </Card> */}
         </div>
 
         {/* My Communities */}
