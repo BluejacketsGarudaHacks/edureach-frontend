@@ -21,3 +21,18 @@ export const getCommunities = async (token: string): Promise<Community[]> => {
         }
     });
 }
+
+export const joinCommunity = async (communityId: string, userId: string, token: string): Promise<Community | null> => {
+    if (token == null) return null;
+    if (userId == "") return null;
+    const data = {
+        communityId: communityId,
+        memberId: userId
+    };
+
+    return api.post("community/add-member", data, {
+        headers: {
+            Authorization: `Bearer ${token}`
+        }
+    });
+}

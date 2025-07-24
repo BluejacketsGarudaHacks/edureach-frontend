@@ -2,6 +2,7 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 import type { ReactNode } from 'react';
 import type { User } from '~/interfaces/user';
 import { authUtils } from '~/lib/auth-middleware';
+import { getUserProfile } from '~/api/user';
 
 interface UserContextType {
   user: User | null;
@@ -30,12 +31,27 @@ export function UserProvider({ children }: UserProviderProps) {
       if (savedUser && token) {
         try {
           setUser(JSON.parse(savedUser));
+          setLoading(false);
         } catch (error) {
           console.error('Error parsing saved user:', error);
           localStorage.removeItem('user');
+          setLoading(false);
         }
+      } else if (token && !savedUser) {
+        getUserProfile(token)
+          .then((userData) => {
+            setUser(userData);
+            setLoading(false);
+          })
+          .catch((error) => {
+            console.error('Failed to fetch user profile:', error);
+            // Token might be invalid, clear it
+            localStorage.removeItem('token');
+            setLoading(false);
+          });
+      } else {
+        setLoading(false);
       }
-      setLoading(false);
     }
   }, []);
 
@@ -53,6 +69,7 @@ export function UserProvider({ children }: UserProviderProps) {
   // Redirect to login when user becomes null (after initial load)
   useEffect(() => {
     if (typeof window !== 'undefined' && !loading) {
+      const token = localStorage.getItem('token');
       const currentPath = window.location.pathname;
       
       // Auth pages that should NOT redirect
@@ -60,7 +77,7 @@ export function UserProvider({ children }: UserProviderProps) {
       const isAuthPage = authPages.some(page => currentPath.startsWith(page));
       
       // If user is null, no token, not on auth page, and not loading - redirect to login
-      if (!user && !isAuthPage) {
+      if (!user && !token && !isAuthPage) {
         window.location.href = '/auth/login';
       }
     }
