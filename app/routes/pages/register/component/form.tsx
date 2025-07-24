@@ -195,6 +195,12 @@ export function Form() {
             </div>
             {errors.confirmPassword && <p className="text-sm text-red-600">{errors.confirmPassword}</p>}
           </div>
+          <div className="flex items-center justify-between text-sm">
+            <label className="flex items-center space-x-2 cursor-pointer">
+              <input type="checkbox" className="rounded border-gray-300" />
+              <span className="text-gray-600">Daftar sebagai volunteer</span>
+            </label>
+          </div>
 
           <Button
             type="submit"
