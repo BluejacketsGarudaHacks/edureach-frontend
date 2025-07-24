@@ -19,21 +19,29 @@ import {
 } from "@/components/ui/dialog"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { ArrowLeft, Upload, User, Mail, Calendar, Lock, Camera, CheckCircle, Eye, EyeOff } from "lucide-react"
+import axios from "axios"
+import { toast } from "sonner"
+import { changePassword, updateUser, type changePasswordInput, type updateUserInput } from "./api"
+import { useNavigate } from "react-router"
+import type { Route } from "./+types/page"
+import { getCurrentUser } from "../home/api"
 
-interface ProfileFormData {
-  fullName: string
-  email: string
-  dateOfBirth: string
-  profilePicture: FileList
+
+export async function clientLoader() {
+
+  const token = localStorage.getItem("token")
+  console.log(token)
+  if (!token) return null
+  const user = await getCurrentUser(token)
+  return user
+
 }
 
-interface PasswordFormData {
-  currentPassword: string
-  newPassword: string
-  confirmPassword: string
+export function HydrateFallback() {
+  return <div>Loading...</div>;
 }
 
-export default function EditProfilePage() {
+export default function EditProfilePage({loaderData}:Route.ComponentProps) {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isSuccess, setIsSuccess] = useState(false)
   const [selectedImage, setSelectedImage] = useState<string>("/placeholder.svg?height=120&width=120")
@@ -44,29 +52,30 @@ export default function EditProfilePage() {
   const [showNewPassword, setShowNewPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
 
-  // Profile form
+  let user = loaderData
+
+  const navigate = useNavigate()
   const {
     register: registerProfile,
     handleSubmit: handleSubmitProfile,
     formState: { errors: profileErrors },
-  } = useForm<ProfileFormData>({
+  } = useForm<updateUserInput>({
     defaultValues: {
       fullName: "John Doe",
-      email: "john.doe@example.com",
+      email: "johndoe@example.com",
       dateOfBirth: "1990-01-15",
     },
   })
 
-  // Password form
   const {
     register: registerPassword,
     handleSubmit: handleSubmitPassword,
     formState: { errors: passwordErrors },
     watch: watchPassword,
     reset: resetPassword,
-  } = useForm<PasswordFormData>()
+  } = useForm<changePasswordInput>()
 
-  const newPassword = watchPassword("newPassword")
+  const newPassword = watchPassword("password")
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
@@ -79,41 +88,51 @@ export default function EditProfilePage() {
     }
   }
 
-  const onSubmitProfile = async (data: ProfileFormData) => {
+  const onSubmitProfile = async (data: updateUserInput) => {
     setIsSubmitting(true)
 
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 2000))
-
-    console.log("Profile Data:", {
-      fullName: data.fullName,
-      email: data.email,
-      dateOfBirth: data.dateOfBirth,
-      profilePicture: data.profilePicture[0]?.name || "No image selected",
-    })
+    const token = window.localStorage.getItem("token")
+    if (!token){
+      toast("Anda tidak diperbolehkan untuk memperbaharui profil anda")
+      return
+    }
+    try {
+      await updateUser({data, token})
+    } catch (error) {
+      if (axios.isAxiosError(error)){
+        toast("Profil gagal diperbaharui")
+      }
+    }    
 
     setIsSubmitting(false)
     setIsSuccess(true)
 
-    // Hide success message after 3 seconds
     setTimeout(() => {
       setIsSuccess(false)
     }, 3000)
   }
 
-  const onSubmitPassword = async (data: PasswordFormData) => {
+  const onSubmitPassword = async (data: changePasswordInput) => {
     setIsPasswordSubmitting(true)
 
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 2000))
+    const token = window.localStorage.getItem("token")
+    if (!token){
+      toast("Anda tidak diperbolehkan untuk mengganti password anda")
+      return
+    }
+    try {
+      await changePassword({data, token})
+    } catch (error) {
+      if (axios.isAxiosError(error)){
+        toast("password gagal diganti")
+      }
+    }  
 
-    console.log("Password changed successfully")
 
     setIsPasswordSubmitting(false)
     setIsPasswordSuccess(true)
     resetPassword()
 
-    // Close modal and hide success message after 2 seconds
     setTimeout(() => {
       setIsPasswordSuccess(false)
       setIsPasswordModalOpen(false)
@@ -121,18 +140,18 @@ export default function EditProfilePage() {
   }
 
   const handleGoBack = () => {
-    console.log("Navigate back to home")
+    navigate("/home")
   }
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header */}
+      {user?.id}
       <header className="bg-white border-b border-gray-200">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center h-16">
             <Button variant="ghost" onClick={handleGoBack} className="mr-4">
               <ArrowLeft className="w-4 h-4 mr-2" />
-              Back to Dashboard
+              Kembali ke beranda
             </Button>
             <div className="flex items-center space-x-2">
               <div className="w-8 h-8 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
@@ -157,7 +176,7 @@ export default function EditProfilePage() {
         {isSuccess && (
           <Alert className="mb-6 border-green-200 bg-green-50">
             <CheckCircle className="w-4 h-4 text-green-600" />
-            <AlertDescription className="text-green-800">Your profile has been updated successfully!</AlertDescription>
+            <AlertDescription className="text-green-800">Profile anda berhasil diperbaharui!</AlertDescription>
           </Alert>
         )}
 
@@ -168,7 +187,7 @@ export default function EditProfilePage() {
               <CardHeader>
                 <CardTitle className="flex items-center space-x-2">
                   <User className="w-5 h-5" />
-                  <span>Personal Information</span>
+                  <span>Informasi personal</span>
                 </CardTitle>
                 <CardDescription>Update your personal details and profile picture.</CardDescription>
               </CardHeader>
@@ -187,14 +206,14 @@ export default function EditProfilePage() {
                       </Avatar>
                       <div className="flex-1">
                         <input
-                          id="profilePicture"
+                          id="image"
                           type="file"
                           accept="image/*"
-                          {...registerProfile("profilePicture")}
+                          {...registerProfile("image")}
                           onChange={handleImageChange}
                           className="hidden"
                         />
-                        <Label htmlFor="profilePicture" className="cursor-pointer">
+                        <Label htmlFor="image" className="cursor-pointer">
                           <Button type="button" variant="outline" asChild>
                             <span>
                               <Upload className="w-4 h-4 mr-2" />
@@ -345,10 +364,10 @@ export default function EditProfilePage() {
                             id="currentPassword"
                             type={showCurrentPassword ? "text" : "password"}
                             placeholder="Enter current password"
-                            {...registerPassword("currentPassword", {
+                            {...registerPassword("password", {
                               required: "Current password is required",
                             })}
-                            className={passwordErrors.currentPassword ? "border-red-500 pr-10" : "pr-10"}
+                            className={passwordErrors.password ? "border-red-500 pr-10" : "pr-10"}
                           />
                           <Button
                             type="button"
@@ -360,20 +379,20 @@ export default function EditProfilePage() {
                             {showCurrentPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                           </Button>
                         </div>
-                        {passwordErrors.currentPassword && (
-                          <p className="text-sm text-red-600">{passwordErrors.currentPassword.message}</p>
+                        {passwordErrors.password && (
+                          <p className="text-sm text-red-600">{passwordErrors.password.message}</p>
                         )}
                       </div>
 
                       {/* New Password */}
                       <div className="space-y-2">
-                        <Label htmlFor="newPassword">New Password *</Label>
+                        <Label htmlFor="confirmPassword">New Password *</Label>
                         <div className="relative">
                           <Input
-                            id="newPassword"
+                            id="confirmPassword"
                             type={showNewPassword ? "text" : "password"}
                             placeholder="Enter new password"
-                            {...registerPassword("newPassword", {
+                            {...registerPassword("confirmPassword", {
                               required: "New password is required",
                               minLength: {
                                 value: 8,
@@ -384,7 +403,7 @@ export default function EditProfilePage() {
                                 message: "Password must contain uppercase, lowercase, and number",
                               },
                             })}
-                            className={passwordErrors.newPassword ? "border-red-500 pr-10" : "pr-10"}
+                            className={passwordErrors.confirmPassword ? "border-red-500 pr-10" : "pr-10"}
                           />
                           <Button
                             type="button"
@@ -396,8 +415,8 @@ export default function EditProfilePage() {
                             {showNewPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                           </Button>
                         </div>
-                        {passwordErrors.newPassword && (
-                          <p className="text-sm text-red-600">{passwordErrors.newPassword.message}</p>
+                        {passwordErrors.confirmPassword && (
+                          <p className="text-sm text-red-600">{passwordErrors.confirmPassword.message}</p>
                         )}
                       </div>
 
