@@ -193,10 +193,6 @@ export default function CommunityListPage() {
     setSelectedCities("Semua Kota"); // Reset city filter when province changes
   };
 
-  const handleGoBack = () => {
-    console.log("Navigate back to home");
-  };
-
   const CommunityCard = ({ community }: { community: Community }) => (
     <Card className="hover:shadow-lg transition-shadow duration-200">
       <div className="aspect-video overflow-hidden rounded-t-lg">
@@ -322,7 +318,7 @@ export default function CommunityListPage() {
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center">
               <Link to={"/home"}>
-                <Button variant="ghost" onClick={handleGoBack} className="mr-4">
+                <Button variant="ghost" className="mr-4">
                   <ArrowLeft className="w-4 h-4 mr-2" />
                   Kembali ke dashboard
                 </Button>
