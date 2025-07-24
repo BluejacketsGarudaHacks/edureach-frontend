@@ -45,8 +45,8 @@ export default function WelcomePage() {
         </h1>
 
         <p className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto leading-relaxed">
-          Revolutionizing Indonesian education with an AI platform that connects students, teachers, and communities in
-          meaningful and accessible learning experiences for everyone.
+          Revolusi pendidikan Indonesia dengan platform AI yang menghubungkan siswa, guru, dan komunitas dalam
+          pengalaman belajar yang bermakna dan dapat diakses oleh semua.
         </p>
 
         <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
@@ -61,22 +61,22 @@ export default function WelcomePage() {
           </Link>
           <Button variant="outline" size="lg" className="px-8 py-3 bg-transparent">
             <Play className="w-4 h-4 mr-2" />
-            Watch Demo
+            Lihat Demo
           </Button>
         </div>
 
         <div className="flex flex-col sm:flex-row gap-8 justify-center items-center text-sm text-gray-600">
           <div className="flex items-center">
             <Star className="w-4 h-4 text-yellow-500 mr-1" />
-            <span className="font-semibold text-gray-900">4.8/5</span> from 1,500+ Indonesian educators
+            <span className="font-semibold text-gray-900">4.8/5</span>&nbsp;dari 1,500+ pendidik Indonesia
           </div>
           <div className="hidden sm:block w-1 h-1 bg-gray-300 rounded-full"></div>
           <div>
-            <span className="font-semibold text-gray-900">25,000+</span> active students
+            <span className="font-semibold text-gray-900">25,000+</span> siswa aktif
           </div>
           <div className="hidden sm:block w-1 h-1 bg-gray-300 rounded-full"></div>
           <div>
-            <span className="font-semibold text-gray-900">800+</span> schools in Indonesia
+            <span className="font-semibold text-gray-900">800+</span> komunitas di Indonesia
           </div>
         </div>
       </section>
@@ -84,10 +84,10 @@ export default function WelcomePage() {
       <section id="features" className="container mx-auto px-4 py-20">
         <div className="text-center mb-16">
           <h2 className="text-3xl md:text-4xl font-bold mb-4 text-gray-900">
-            Leading Features for Indonesian Education
+            Fitur Unggulan untuk Pendidikan Indonesia
           </h2>
           <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-            AI technology and strong community to support equitable learning throughout Indonesia.
+            Teknologi AI dan komunitas yang kuat untuk mendukung pembelajaran yang merata di seluruh Indonesia.
           </p>
         </div>
 
@@ -97,22 +97,23 @@ export default function WelcomePage() {
               <div className="w-16 h-16 bg-gradient-to-r from-blue-500 to-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-6">
                 <Zap className="w-8 h-8 text-white" />
               </div>
-              <h3 className="text-xl font-semibold mb-4 text-gray-900">Multilingual AI Summarizer</h3>
+              <h3 className="text-xl font-semibold mb-4 text-gray-900">AI Summarizer Multibahasa</h3>
               <p className="text-gray-600 leading-relaxed mb-4">
-                Summarize learning materials in Indonesian, English, or regional languages with advanced AI technology.
+                Rangkum materi pembelajaran dalam bahasa Indonesia, Inggris, atau bahasa daerah dengan teknologi AI
+                canggih.
               </p>
               <div className="flex flex-wrap gap-2 justify-center">
                 <Badge variant="secondary" className="text-xs">
-                  Indonesian
+                  Bahasa Indonesia
                 </Badge>
                 <Badge variant="secondary" className="text-xs">
                   English
                 </Badge>
                 <Badge variant="secondary" className="text-xs">
-                  Javanese
+                  Bahasa Jawa
                 </Badge>
                 <Badge variant="secondary" className="text-xs">
-                  Sundanese
+                  Bahasa Sunda
                 </Badge>
               </div>
             </CardContent>
@@ -123,19 +124,19 @@ export default function WelcomePage() {
               <div className="w-16 h-16 bg-gradient-to-r from-purple-500 to-purple-600 rounded-2xl flex items-center justify-center mx-auto mb-6">
                 <Users className="w-8 h-8 text-white" />
               </div>
-              <h3 className="text-xl font-semibold mb-4 text-gray-900">Volunteer Teacher Community</h3>
+              <h3 className="text-xl font-semibold mb-4 text-gray-900">Komunitas Guru Relawan</h3>
               <p className="text-gray-600 leading-relaxed mb-4">
-                Join the Indonesian educator community and become a volunteer teacher to share knowledge with others.
+                Bergabung dengan komunitas pendidik Indonesia dan jadilah guru relawan untuk berbagi ilmu dengan sesama.
               </p>
               <div className="flex flex-wrap gap-2 justify-center">
                 <Badge variant="secondary" className="text-xs">
-                  Free Teaching
+                  Mengajar Gratis
                 </Badge>
                 <Badge variant="secondary" className="text-xs">
-                  Active Community
+                  Komunitas Aktif
                 </Badge>
                 <Badge variant="secondary" className="text-xs">
-                  Certification
+                  Sertifikat
                 </Badge>
               </div>
             </CardContent>
@@ -147,7 +148,9 @@ export default function WelcomePage() {
         <div className="container mx-auto px-4">
           <div className="flex flex-col md:flex-row justify-between items-center">
             <div className="flex items-center space-x-2 mb-4 md:mb-0">
-              <Logo />
+              <div className="w-8 h-8 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
+                <BookOpen className="w-5 h-5 text-white" />
+              </div>
               <span className="text-2xl font-bold">EduReach</span>
             </div>
             <div className="flex space-x-6 text-sm">
