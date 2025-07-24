@@ -26,6 +26,7 @@ import {
   ArrowLeft,
   BookOpen,
   Zap,
+  Users,
 } from "lucide-react";
 import {
   Select,
@@ -35,7 +36,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
-import { NavLink } from "react-router";
+import { NavLink, useNavigate } from "react-router";
 
 function useTiptapEditor(): Editor | null {
   const editor = useEditor({
@@ -61,6 +62,7 @@ export default function SummarizerPage() {
   const [isProcessing, setIsProcessing] = useState(false);
   const [progress, setProgress] = useState(0);
   const [selectedLanguage, setSelectedLanguage] = useState("id");
+  const navigate = useNavigate();
 
   const languageOptions = [
     { value: "id", label: "Indonesia" },
@@ -173,28 +175,30 @@ export default function SummarizerPage() {
     }
   };
 
+  const handleGoBack = () => {
+    navigate("/home");
+  };
+
   if (!isClient || !editor) return null;
 
   return (
     <div className="min-h-screen bg-white">
       {/* Header */}
-      <header className="border-b border-gray-100">
-        <div className="max-w-7xl mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
-            <NavLink
-              to="/home"
-              className="inline-flex items-center gap-2 text-blue-600 hover:text-blue-700 transition-colors"
-            >
-              <ArrowLeft className="w-4 h-4" />
-              Kembali ke beranda
-            </NavLink>
-            <NavLink to="/home" className="flex items-center gap-2">
-              <div className="p-2 bg-blue-600 rounded-lg">
-                <BookOpen className="w-5 h-5 text-white" />
+      <header className="bg-white border-b border-gray-200">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center h-16">
+            <Button variant="ghost" onClick={handleGoBack} className="mr-4">
+              <ArrowLeft className="w-4 h-4 mr-2" />
+              Kembali ke dashboard
+            </Button>
+            <div className="flex items-center space-x-2">
+              <div className="w-8 h-8 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
+                <Users className="w-5 h-5 text-white" />
               </div>
-              <span className="text-xl font-bold text-gray-900">EduReach</span>
-            </NavLink>
-            <div className="w-24"></div> {/* Spacer for balance */}
+              <span className="text-xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                EduReach
+              </span>
+            </div>
           </div>
         </div>
       </header>
@@ -372,11 +376,6 @@ export default function SummarizerPage() {
               </CardContent>
             </Card>
           </div>
-        </div>
-
-        {/* Footer */}
-        <div className="text-center text-sm text-gray-500 pt-8">
-          <p>Powered by advanced AI • Secure processing • No data stored</p>
         </div>
       </div>
     </div>
