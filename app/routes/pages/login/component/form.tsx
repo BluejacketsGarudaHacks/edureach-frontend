@@ -11,7 +11,7 @@ import { login, loginInputSchema, type loginInput } from "../api"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { Form, FormControl, FormField, FormItem, FormMessage } from "~/components/ui/form"
 import Logo from "~/components/logo"
-import { toast } from "sonner"
+import { toast, Toaster } from "sonner"
 import axios from "axios"
 
 export function LoginForm() {
@@ -27,7 +27,6 @@ export function LoginForm() {
   const handleSubmit = async  (data:loginInput) => {
       try {
         let response = await login({data})
-
         toast("Login success. redirecting to homepage")
       } catch (error) {
         if (axios.isAxiosError(error)){
@@ -38,6 +37,7 @@ export function LoginForm() {
 
   return (
       <Card className="w-full max-w-md shadow-xl border-0">
+        <Toaster />
         <CardHeader className="text-center pb-6">
           <div className="flex items-center justify-center space-x-2 mb-4">
             <div className="w-10 h-10 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
