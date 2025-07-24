@@ -1,19 +1,18 @@
 import { Button } from "../../components/ui/button";
 import { ArrowLeft } from "lucide-react";
 import { LoginForm } from "./component/form";
-import { useAuthGuard } from "~/lib/auth-middleware";
 import { useNavigate } from "react-router";
 import { useEffect } from "react";
+import { checkAuth } from "~/lib/auth-loader";
 
 export default function LoginPage() {
-  const { isAuthenticated } = useAuthGuard();
   const nav = useNavigate();
 
   useEffect(() => {
-    if (isAuthenticated()) {
+    if (checkAuth()) {
       nav("/home", { replace: true });
     }
-  }, [isAuthenticated, nav]);
+  }, []);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 flex items-center justify-center p-4">
