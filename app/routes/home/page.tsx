@@ -29,9 +29,11 @@ import type { User } from "~/interfaces/user";
 import type { Route } from "./+types/page";
 import { useAuthGuard } from "~/lib/auth-middleware";
 
+export default function HomePage({ loaderData }: Route.ComponentProps) {
+  useEffect(() => {
+    window.document.title = "Home | EduReach";
+  }, []);
 
-
-export default function HomePage() {
   const { isAuthenticated, logout } = useAuthGuard();
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [profilePicture, setProfilePicture] = useState("");
@@ -140,28 +142,13 @@ export default function HomePage() {
             Welcome back, {currentUser?.fullName}! 👋
           </h1>
           <p className="text-gray-600">
-            Ready to continue your educational journey? Here's what you can do today.
+            Ready to continue your educational journey? Here's what you can do
+            today.
           </p>
         </div>
 
         {/* Quick Stats */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <Card>
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-gray-600">
-                    Communities Joined
-                  </p>
-                  <p className="text-2xl font-bold text-gray-900">3</p>
-                </div>
-                <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
-                  <Users className="w-6 h-6 text-purple-600" />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
           <Card>
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
@@ -183,6 +170,22 @@ export default function HomePage() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm font-medium text-gray-600">
+                    Communities Joined
+                  </p>
+                  <p className="text-2xl font-bold text-gray-900">3</p>
+                </div>
+                <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
+                  <Users className="w-6 h-6 text-purple-600" />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* <Card>
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-gray-600">
                     Learning Hours
                   </p>
                   <p className="text-2xl font-bold text-gray-900">24</p>
@@ -192,7 +195,7 @@ export default function HomePage() {
                 </div>
               </div>
             </CardContent>
-          </Card>
+          </Card> */}
         </div>
 
         {/* Main Features */}
@@ -207,7 +210,8 @@ export default function HomePage() {
                 Summarizer AI Multibahasa
               </CardTitle>
               <CardDescription className="text-gray-600">
-                Rangkum materi pembelajaran dalam bahasa Indonesia, Inggris, atau bahasa daerah dengan teknologi AI canggih.
+                Rangkum materi pembelajaran dalam bahasa Indonesia, Inggris,
+                atau bahasa daerah dengan teknologi AI canggih.
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -279,7 +283,7 @@ export default function HomePage() {
           </Card>
 
           {/* Recent Activity */}
-          <Card>
+          {/* <Card>
             <CardHeader>
               <CardTitle className="text-xl font-bold">
                 Recent Activity
@@ -325,7 +329,7 @@ export default function HomePage() {
                 </div>
               </div>
             </CardContent>
-          </Card>
+          </Card> */}
         </div>
 
         {/* My Communities */}

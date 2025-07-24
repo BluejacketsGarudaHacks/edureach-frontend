@@ -1,24 +1,46 @@
-"use client"
+"use client";
 
-import { useState, useMemo } from "react"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Badge } from "@/components/ui/badge"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { ArrowLeft, Search, MapPin, Users, UserCheck, Plus, Grid3X3, List, BookOpen } from "lucide-react"
-import { useAuthGuard } from "~/lib/auth-middleware"
+import { useState, useMemo, useEffect } from "react";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Badge } from "@/components/ui/badge";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  ArrowLeft,
+  Search,
+  MapPin,
+  Users,
+  UserCheck,
+  Plus,
+  Grid3X3,
+  List,
+  BookOpen,
+} from "lucide-react";
+import { useAuthGuard } from "~/lib/auth-middleware";
 
 interface Community {
-  id: string
-  name: string
-  description: string
-  location: string
-  image: string
-  memberCount: number
-  volunteerCount: number
-  category: string
-  isJoined: boolean
+  id: string;
+  name: string;
+  description: string;
+  location: string;
+  image: string;
+  memberCount: number;
+  volunteerCount: number;
+  category: string;
+  isJoined: boolean;
 }
 
 const mockCommunities: Community[] = [
@@ -118,7 +140,7 @@ const mockCommunities: Community[] = [
     category: "Special Education",
     isJoined: true,
   },
-]
+];
 
 const indonesianCities = [
   "All Cities",
@@ -136,7 +158,7 @@ const indonesianCities = [
   "Batam",
   "Pekanbaru",
   "Yogyakarta",
-]
+];
 
 const categories = [
   "All Categories",
@@ -148,23 +170,27 @@ const categories = [
   "Primary Education",
   "Environmental",
   "Special Education",
-]
+];
 
 const sortOptions = [
   { value: "members", label: "Most Members" },
   { value: "volunteers", label: "Most Volunteers" },
   { value: "name", label: "Name A-Z" },
   { value: "location", label: "Location A-Z" },
-]
+];
 
 export default function CommunityListPage() {
+  useEffect(() => {
+    window.document.title = "Jelajahi Komunitas | EduReach";
+  }, []);
+
   const { isAuthenticated } = useAuthGuard();
-  const [searchQuery, setSearchQuery] = useState("")
-  const [selectedLocation, setSelectedLocation] = useState("All Cities")
-  const [selectedCategory, setSelectedCategory] = useState("All Categories")
-  const [sortBy, setSortBy] = useState("members")
-  const [viewMode, setViewMode] = useState<"grid" | "list">("grid")
-  const [communities, setCommunities] = useState(mockCommunities)
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedLocation, setSelectedLocation] = useState("All Cities");
+  const [selectedCategory, setSelectedCategory] = useState("All Categories");
+  const [sortBy, setSortBy] = useState("members");
+  const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
+  const [communities, setCommunities] = useState(mockCommunities);
 
   // Don't render if not authenticated
   if (!isAuthenticated()) {
@@ -175,31 +201,35 @@ export default function CommunityListPage() {
     const filtered = communities.filter((community) => {
       const matchesSearch =
         community.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        community.description.toLowerCase().includes(searchQuery.toLowerCase())
-      const matchesLocation = selectedLocation === "All Cities" || community.location === selectedLocation
-      const matchesCategory = selectedCategory === "All Categories" || community.category === selectedCategory
+        community.description.toLowerCase().includes(searchQuery.toLowerCase());
+      const matchesLocation =
+        selectedLocation === "All Cities" ||
+        community.location === selectedLocation;
+      const matchesCategory =
+        selectedCategory === "All Categories" ||
+        community.category === selectedCategory;
 
-      return matchesSearch && matchesLocation && matchesCategory
-    })
+      return matchesSearch && matchesLocation && matchesCategory;
+    });
 
     // Sort communities
     filtered.sort((a, b) => {
       switch (sortBy) {
         case "members":
-          return b.memberCount - a.memberCount
+          return b.memberCount - a.memberCount;
         case "volunteers":
-          return b.volunteerCount - a.volunteerCount
+          return b.volunteerCount - a.volunteerCount;
         case "name":
-          return a.name.localeCompare(b.name)
+          return a.name.localeCompare(b.name);
         case "location":
-          return a.location.localeCompare(b.location)
+          return a.location.localeCompare(b.location);
         default:
-          return 0
+          return 0;
       }
-    })
+    });
 
-    return filtered
-  }, [communities, searchQuery, selectedLocation, selectedCategory, sortBy])
+    return filtered;
+  }, [communities, searchQuery, selectedLocation, selectedCategory, sortBy]);
 
   const handleJoinCommunity = (communityId: string) => {
     setCommunities((prev) =>
@@ -208,30 +238,38 @@ export default function CommunityListPage() {
           ? {
               ...community,
               isJoined: !community.isJoined,
-              memberCount: community.isJoined ? community.memberCount - 1 : community.memberCount + 1,
+              memberCount: community.isJoined
+                ? community.memberCount - 1
+                : community.memberCount + 1,
             }
-          : community,
-      ),
-    )
-  }
+          : community
+      )
+    );
+  };
 
   const handleGoBack = () => {
-    console.log("Navigate back to home")
-  }
+    console.log("Navigate back to home");
+  };
 
   const handleCreateCommunity = () => {
-    console.log("Navigate to create community page")
-  }
+    console.log("Navigate to create community page");
+  };
 
   const CommunityCard = ({ community }: { community: Community }) => (
     <Card className="hover:shadow-lg transition-shadow duration-200">
       <div className="aspect-video overflow-hidden rounded-t-lg">
-        <img src={community.image || "/placeholder.svg"} alt={community.name} className="w-full h-full object-cover" />
+        <img
+          src={community.image || "/placeholder.svg"}
+          alt={community.name}
+          className="w-full h-full object-cover"
+        />
       </div>
       <CardHeader className="pb-3">
         <div className="flex items-start justify-between">
           <div className="flex-1">
-            <CardTitle className="text-lg font-semibold line-clamp-1">{community.name}</CardTitle>
+            <CardTitle className="text-lg font-semibold line-clamp-1">
+              {community.name}
+            </CardTitle>
             <div className="flex items-center text-sm text-gray-500 mt-1">
               <MapPin className="w-3 h-3 mr-1" />
               {community.location}
@@ -243,7 +281,9 @@ export default function CommunityListPage() {
         </div>
       </CardHeader>
       <CardContent className="pt-0">
-        <CardDescription className="text-sm text-gray-600 line-clamp-2 mb-4">{community.description}</CardDescription>
+        <CardDescription className="text-sm text-gray-600 line-clamp-2 mb-4">
+          {community.description}
+        </CardDescription>
 
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center space-x-4 text-sm text-gray-600">
@@ -271,7 +311,7 @@ export default function CommunityListPage() {
         </Button>
       </CardContent>
     </Card>
-  )
+  );
 
   const CommunityListItem = ({ community }: { community: Community }) => (
     <Card className="hover:shadow-md transition-shadow duration-200">
@@ -285,7 +325,9 @@ export default function CommunityListPage() {
           <div className="flex-1 min-w-0">
             <div className="flex items-start justify-between mb-2">
               <div>
-                <h3 className="text-lg font-semibold text-gray-900 line-clamp-1">{community.name}</h3>
+                <h3 className="text-lg font-semibold text-gray-900 line-clamp-1">
+                  {community.name}
+                </h3>
                 <div className="flex items-center text-sm text-gray-500 mt-1">
                   <MapPin className="w-3 h-3 mr-1" />
                   {community.location}
@@ -296,7 +338,9 @@ export default function CommunityListPage() {
               </Badge>
             </div>
 
-            <p className="text-sm text-gray-600 line-clamp-2 mb-3">{community.description}</p>
+            <p className="text-sm text-gray-600 line-clamp-2 mb-3">
+              {community.description}
+            </p>
 
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-4 text-sm text-gray-600">
@@ -327,7 +371,7 @@ export default function CommunityListPage() {
         </div>
       </CardContent>
     </Card>
-  )
+  );
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -365,9 +409,12 @@ export default function CommunityListPage() {
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Page Header */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Discover Communities</h1>
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">
+            Discover Communities
+          </h1>
           <p className="text-gray-600">
-            Join educational communities across Indonesia and connect with fellow educators and learners.
+            Join educational communities across Indonesia and connect with
+            fellow educators and learners.
           </p>
         </div>
 
@@ -388,7 +435,10 @@ export default function CommunityListPage() {
             </div>
 
             {/* Location Filter */}
-            <Select value={selectedLocation} onValueChange={setSelectedLocation}>
+            <Select
+              value={selectedLocation}
+              onValueChange={setSelectedLocation}
+            >
               <SelectTrigger>
                 <SelectValue placeholder="All Cities" />
               </SelectTrigger>
@@ -419,7 +469,8 @@ export default function CommunityListPage() {
           {/* View Toggle and Results Count */}
           <div className="flex items-center justify-between">
             <p className="text-sm text-gray-600">
-              Showing {filteredAndSortedCommunities.length} of {communities.length} communities
+              Showing {filteredAndSortedCommunities.length} of{" "}
+              {communities.length} communities
             </p>
 
             <div className="flex items-center space-x-2">
@@ -447,8 +498,12 @@ export default function CommunityListPage() {
             <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
               <Search className="w-8 h-8 text-gray-400" />
             </div>
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">No communities found</h3>
-            <p className="text-gray-600 mb-4">Try adjusting your search criteria or create a new community.</p>
+            <h3 className="text-lg font-semibold text-gray-900 mb-2">
+              No communities found
+            </h3>
+            <p className="text-gray-600 mb-4">
+              Try adjusting your search criteria or create a new community.
+            </p>
             <Button
               onClick={handleCreateCommunity}
               className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
@@ -458,7 +513,13 @@ export default function CommunityListPage() {
             </Button>
           </div>
         ) : (
-          <div className={viewMode === "grid" ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" : "space-y-4"}>
+          <div
+            className={
+              viewMode === "grid"
+                ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+                : "space-y-4"
+            }
+          >
             {filteredAndSortedCommunities.map((community) => (
               <div key={community.id}>
                 {viewMode === "grid" ? (
@@ -472,5 +533,5 @@ export default function CommunityListPage() {
         )}
       </main>
     </div>
-  )
+  );
 }
