@@ -25,12 +25,11 @@ import Logo from "~/components/logo";
 import { Link } from "react-router";
 import { useEffect, useState } from "react";
 import { getCurrentUser } from "./api";
-import type { User } from "~/interfaces/user";
 import type { Route } from "./+types/page";
 import { useAuthGuard } from "~/lib/auth-middleware";
 import { useUser } from "~/hooks/useUser";
 
-export default function HomePage({ loaderData }: Route.ComponentProps) {
+export default function HomePage() {
   useEffect(() => {
     window.document.title = "Home | EduReach";
   }, []);
@@ -40,13 +39,11 @@ export default function HomePage({ loaderData }: Route.ComponentProps) {
   const [profilePicture, setProfilePicture] = useState("");
   const [avatarFallback, setAvatarFallback] = useState("XX");
 
-  // Custom logout that clears user context
   const logout = () => {
     clearUser();
     authLogout();
   };
 
-  // Don't render if not authenticated
   if (!isAuthenticated()) {
     return null;
   }
@@ -79,7 +76,6 @@ export default function HomePage({ loaderData }: Route.ComponentProps) {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header */}
       <header className="bg-white border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
@@ -113,9 +109,7 @@ export default function HomePage({ loaderData }: Route.ComponentProps) {
         </div>
       </header>
 
-      {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Welcome Section */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900 mb-2">
             Selamat datang, {user?.fullName}! 👋
@@ -126,7 +120,6 @@ export default function HomePage({ loaderData }: Route.ComponentProps) {
           </p>
         </div>
 
-        {/* Quick Stats */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
           <Card>
             <CardContent className="p-6">
@@ -161,9 +154,7 @@ export default function HomePage({ loaderData }: Route.ComponentProps) {
           </Card>
         </div>
 
-        {/* Main Features */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
-          {/* Multilingual AI Summarizer */}
           <Card className="hover:shadow-lg transition-shadow duration-200">
             <CardHeader className="text-center pb-4">
               <div className="w-16 h-16 bg-gradient-to-r from-blue-500 to-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
@@ -197,7 +188,6 @@ export default function HomePage({ loaderData }: Route.ComponentProps) {
             </CardContent>
           </Card>
 
-          {/* Volunteer Teacher Community */}
           <Card className="hover:shadow-lg transition-shadow duration-200">
             <CardHeader className="text-center pb-4">
               <div className="w-16 h-16 bg-gradient-to-r from-purple-500 to-purple-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
@@ -236,7 +226,6 @@ export default function HomePage({ loaderData }: Route.ComponentProps) {
           </Card>
         </div>
 
-        {/* My Communities */}
         <Card>
           <CardHeader>
             <CardTitle className="text-xl font-bold">Komunitas Saya</CardTitle>
