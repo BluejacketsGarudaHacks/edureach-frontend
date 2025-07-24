@@ -19,6 +19,7 @@ import {
 } from "@/components/ui/dialog"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { ArrowLeft, Upload, User, Mail, Calendar, Lock, Camera, CheckCircle, Eye, EyeOff } from "lucide-react"
+import { useAuthGuard } from "~/lib/auth-middleware"
 
 interface ProfileFormData {
   fullName: string
@@ -34,6 +35,7 @@ interface PasswordFormData {
 }
 
 export default function EditProfilePage() {
+  const { isAuthenticated } = useAuthGuard();
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isSuccess, setIsSuccess] = useState(false)
   const [selectedImage, setSelectedImage] = useState<string>("/placeholder.svg?height=120&width=120")
@@ -43,6 +45,11 @@ export default function EditProfilePage() {
   const [showCurrentPassword, setShowCurrentPassword] = useState(false)
   const [showNewPassword, setShowNewPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
+
+  // Don't render if not authenticated
+  if (!isAuthenticated()) {
+    return null;
+  }
 
   // Profile form
   const {

@@ -16,6 +16,7 @@ import { useNavigate } from "react-router"
 import { createCommunity, type createCommunityInput } from "./api"
 import { toast } from "sonner"
 import axios from "axios"
+import { useAuthGuard } from "~/lib/auth-middleware"
 
 const indonesianLocations = [
   "Jakarta",
@@ -51,11 +52,17 @@ const indonesianLocations = [
 ]
 
 export default function CreateCommunityPage() {
+  const { isAuthenticated } = useAuthGuard();
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isSuccess, setIsSuccess] = useState(false)
   const [selectedImage, setSelectedImage] = useState<string | null>(null)
 
   const navigate = useNavigate();
+
+  // Don't render if not authenticated
+  if (!isAuthenticated()) {
+    return null;
+  }
 
   const {
     register,
