@@ -347,11 +347,10 @@ export default function CommunityDetailPage({ loaderData }: Route.ComponentProps
         <Card className="mb-8 shadow-lg border-0 overflow-hidden">
           <div className="relative">
             <img
-              src={`${import.meta.env.VITE_BACKEND_URL}${community?.imagePath}` || "/placeholder.svg"}
+              src={`${import.meta.env.VITE_BACKEND_URL}${community.imagePath}` || "/placeholder.svg"}
               alt={community.name}
               className="w-full h-64 object-cover"
             />
-            <div className="absolute inset-0 bg-black bg-opacity-40"></div>
             <div className="absolute bottom-6 left-6 text-white">
               <h1 className="text-4xl font-bold mb-2">{community.name}</h1>
               <div className="flex items-center space-x-4 text-sm">
