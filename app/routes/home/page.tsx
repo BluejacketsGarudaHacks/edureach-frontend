@@ -27,11 +27,18 @@ import { useEffect, useState } from "react";
 import { getCurrentUser } from "./api";
 import type { User } from "~/interfaces/user";
 import type { Route } from "./+types/page";
+import { useAuthGuard } from "~/lib/auth-middleware";
 
 export default function HomePage({ loaderData }: Route.ComponentProps) {
+  const { isAuthenticated, logout } = useAuthGuard();
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [profilePicture, setProfilePicture] = useState("");
   const [avatarFallback, setAvatarFallback] = useState("XX");
+
+  // Don't render if not authenticated
+  if (!isAuthenticated()) {
+    return null;
+  }
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -113,7 +120,7 @@ export default function HomePage({ loaderData }: Route.ComponentProps) {
                 <AvatarImage src={profilePicture} />
                 <AvatarFallback>{avatarFallback}</AvatarFallback>
               </Avatar>
-              <Button variant="ghost" size="icon">
+              <Button variant="ghost" size="icon" onClick={logout}>
                 <LogOut className="w-5 h-5" />
               </Button>
             </div>
@@ -129,8 +136,7 @@ export default function HomePage({ loaderData }: Route.ComponentProps) {
             Welcome back, {currentUser?.fullName}! 👋
           </h1>
           <p className="text-gray-600">
-            Ready to continue your educational journey? Here's what you can do
-            today.
+            Ready to continue your educational journey? Here's what you can do today.
           </p>
         </div>
 
@@ -197,16 +203,19 @@ export default function HomePage({ loaderData }: Route.ComponentProps) {
                 Summarizer AI Multibahasa
               </CardTitle>
               <CardDescription className="text-gray-600">
-                Summarize learning materials in Indonesian, English, or regional
-                languages with advanced AI technology.
+                Rangkum materi pembelajaran dalam bahasa Indonesia, Inggris, atau bahasa daerah dengan teknologi AI canggih.
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="flex flex-wrap gap-2 justify-center">
                 <Badge variant="secondary">Bahasa Indonesia</Badge>
-                <Badge variant="secondary">Inggris</Badge>
+                <Badge variant="secondary">Bali</Badge>
                 <Badge variant="secondary">Jawa</Badge>
                 <Badge variant="secondary">Sunda</Badge>
+                <Badge variant="secondary">Batak Toba</Badge>
+                <Badge variant="secondary">Batak Karo</Badge>
+                <Badge variant="secondary">Batak Simalungun</Badge>
+                <Badge variant="secondary">Minang</Badge>
               </div>
               <Link to={"/summarizer"}>
                 <Button

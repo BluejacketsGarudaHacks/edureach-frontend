@@ -21,27 +21,18 @@ import { Alert, AlertDescription } from "@/components/ui/alert"
 import { ArrowLeft, Upload, User, Mail, Calendar, Lock, Camera, CheckCircle, Eye, EyeOff } from "lucide-react"
 import axios from "axios"
 import { toast } from "sonner"
-import { changePassword, updateUser, type changePasswordInput, type updateUserInput } from "../../profile/api"
 import { useNavigate } from "react-router"
 import type { Route } from "./+types/page"
 import { getCurrentUser } from "../home/api"
-
-
-export async function clientLoader() {
-
-  const token = localStorage.getItem("token")
-  console.log(token)
-  if (!token) return null
-  const user = await getCurrentUser(token)
-  return user
-
-}
+import { useAuthGuard } from "~/lib/auth-middleware"
+import { changePassword, updateUser, type changePasswordInput, type updateUserInput } from "./api"
 
 export function HydrateFallback() {
   return <div>Loading...</div>;
 }
 
-export default function EditProfilePage({loaderData}:Route.ComponentProps) {
+export default function EditProfilePage() {
+  const { isAuthenticated } = useAuthGuard();
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isSuccess, setIsSuccess] = useState(false)
   const [selectedImage, setSelectedImage] = useState<string>("/placeholder.svg?height=120&width=120")
@@ -52,9 +43,12 @@ export default function EditProfilePage({loaderData}:Route.ComponentProps) {
   const [showNewPassword, setShowNewPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
 
-  let user = loaderData
-
   const navigate = useNavigate()
+  // Don't render if not authenticated
+  if (!isAuthenticated()) {
+    return null;
+  }
+
   const {
     register: registerProfile,
     handleSubmit: handleSubmitProfile,
@@ -145,7 +139,6 @@ export default function EditProfilePage({loaderData}:Route.ComponentProps) {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {user?.id}
       <header className="bg-white border-b border-gray-200">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center h-16">

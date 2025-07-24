@@ -16,6 +16,7 @@ import { useNavigate } from "react-router"
 import { createCommunity, type createCommunityInput } from "./api"
 import { toast } from "sonner"
 import axios from "axios"
+import { useAuthGuard } from "~/lib/auth-middleware"
 
 const indonesianLocations = [
   "Jakarta",
@@ -51,11 +52,17 @@ const indonesianLocations = [
 ]
 
 export default function CreateCommunityPage() {
+  const { isAuthenticated } = useAuthGuard();
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isSuccess, setIsSuccess] = useState(false)
   const [selectedImage, setSelectedImage] = useState<string | null>(null)
 
   const navigate = useNavigate();
+
+  // Don't render if not authenticated
+  if (!isAuthenticated()) {
+    return null;
+  }
 
   const {
     register,
@@ -279,8 +286,8 @@ export default function CreateCommunityPage() {
                             <p className="text-sm text-gray-600">Click to change image</p>
                           </div>
                         ) : (
-                          <div className="space-y-2">
-                            <Upload className="w-8 h-8 text-gray-400 mx-auto" />
+                          <div className="flex items-center gap-5 space-y-2">
+                            <Upload className="w-8 h-8 text-gray-400 mx-auto m-0" />
                             <div>
                               <p className="text-sm font-medium text-gray-900">Click to upload an image</p>
                               <p className="text-sm text-gray-500">PNG, JPG, GIF up to 10MB</p>
