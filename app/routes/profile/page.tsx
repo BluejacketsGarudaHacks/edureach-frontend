@@ -23,6 +23,12 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import axios from "axios"
+import { toast, Toaster } from "sonner"
+import { useNavigate } from "react-router"
+import type { Route } from "./+types/page"
+import { getCurrentUser } from "../home/api"
+import { changePassword, updateUser, type changePasswordInput, type updateUserInput } from "./api"
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import {
   ArrowLeft,
@@ -38,69 +44,72 @@ import {
 } from "lucide-react";
 import { useAuthGuard } from "~/lib/auth-middleware";
 
-interface ProfileFormData {
-  fullName: string;
-  email: string;
-  dateOfBirth: string;
-  profilePicture: FileList;
+export async function clientLoader() {
+
+  const token = window.localStorage.getItem("token")
+    if (!token){
+      return null
+    }
+  const product = await getCurrentUser(token)
+  return product;
 }
 
-interface PasswordFormData {
-  currentPassword: string;
-  newPassword: string;
-  confirmPassword: string;
+
+export function HydrateFallback() {
+  return <div>Loading...</div>;
 }
 
-export default function EditProfilePage() {
+export default function EditProfilePage({loaderData}:Route.ComponentProps) {
+  const { isAuthenticated } = useAuthGuard();
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [isSuccess, setIsSuccess] = useState(false)
+  const [currentFile, setCurrentFile] = useState<File>()
+  const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false)
+  const [isPasswordSubmitting, setIsPasswordSubmitting] = useState(false)
+  const [isPasswordSuccess, setIsPasswordSuccess] = useState(false)
+  const [showCurrentPassword, setShowCurrentPassword] = useState(false)
+  const [showNewPassword, setShowNewPassword] = useState(false)
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false)
+
   useEffect(() => {
     window.document.title = "Profil | EduReach";
   }, []);
 
-  const { isAuthenticated } = useAuthGuard();
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isSuccess, setIsSuccess] = useState(false);
-  const [selectedImage, setSelectedImage] = useState<string>(
-    "/placeholder.svg?height=120&width=120"
-  );
-  const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
-  const [isPasswordSubmitting, setIsPasswordSubmitting] = useState(false);
-  const [isPasswordSuccess, setIsPasswordSuccess] = useState(false);
-  const [showCurrentPassword, setShowCurrentPassword] = useState(false);
-  const [showNewPassword, setShowNewPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  let user = loaderData
 
-  // Don't render if not authenticated
-  if (!isAuthenticated()) {
+  const navigate = useNavigate()
+  if (!isAuthenticated() || !user) {
     return null;
   }
 
-  // Profile form
   const {
     register: registerProfile,
     handleSubmit: handleSubmitProfile,
     formState: { errors: profileErrors },
-  } = useForm<ProfileFormData>({
+  } = useForm<updateUserInput>({
     defaultValues: {
-      fullName: "John Doe",
-      email: "john.doe@example.com",
-      dateOfBirth: "1990-01-15",
+      fullName: user.fullName,
+      email: user.email,
+      dateOfBirth: user.dob,
     },
-  });
+  })
+  const [selectedImage, setSelectedImage] = useState<string>(`${import.meta.env.VITE_BACKEND_URL}${user.imagePath}`)
 
-  // Password form
   const {
     register: registerPassword,
     handleSubmit: handleSubmitPassword,
     formState: { errors: passwordErrors },
     watch: watchPassword,
     reset: resetPassword,
-  } = useForm<PasswordFormData>();
+  } = useForm<changePasswordInput>()
 
   const newPassword = watchPassword("newPassword");
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
+
+      setCurrentFile(file)
       const reader = new FileReader();
       reader.onload = (e) => {
         setSelectedImage(e.target?.result as string);
@@ -109,41 +118,58 @@ export default function EditProfilePage() {
     }
   };
 
-  const onSubmitProfile = async (data: ProfileFormData) => {
-    setIsSubmitting(true);
+  const onSubmitProfile = async (data: updateUserInput) => {
+    setIsSubmitting(true)
+    
+    const token = window.localStorage.getItem("token")
+    if (!token){
+      toast("Anda tidak diperbolehkan untuk memperbaharui profil anda")
+      return
+    }
+    try {
+      if (currentFile){
+        data.image = currentFile
+        await updateUser({data, token})
+        toast("Profil berhasil diperbaharui")
+      }
+    } catch (error) {
+      if (axios.isAxiosError(error)){
+        toast("Profil gagal diperbaharui")
+        setIsSubmitting(false)
+        return
+      }
+    }    
+    
+    setIsSubmitting(false)
+    setIsSuccess(true)
 
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 2000));
-
-    console.log("Profile Data:", {
-      fullName: data.fullName,
-      email: data.email,
-      dateOfBirth: data.dateOfBirth,
-      profilePicture: data.profilePicture[0]?.name || "No image selected",
-    });
-
-    setIsSubmitting(false);
-    setIsSuccess(true);
-
-    // Hide success message after 3 seconds
     setTimeout(() => {
       setIsSuccess(false);
     }, 3000);
   };
 
-  const onSubmitPassword = async (data: PasswordFormData) => {
-    setIsPasswordSubmitting(true);
+  const onSubmitPassword = async (data: changePasswordInput) => {
+    setIsPasswordSubmitting(true)
 
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 2000));
-
-    console.log("Password changed successfully");
+    const token = window.localStorage.getItem("token")
+    if (!token){
+      toast("Anda tidak diperbolehkan untuk mengganti password anda")
+      return
+    }
+    try {
+      await changePassword({data, token})
+      toast("password berhasil diganti")
+    } catch (error) {
+      if (axios.isAxiosError(error)){
+        toast("password gagal diganti")
+        return
+      }
+    }  
 
     setIsPasswordSubmitting(false);
     setIsPasswordSuccess(true);
     resetPassword();
 
-    // Close modal and hide success message after 2 seconds
     setTimeout(() => {
       setIsPasswordSuccess(false);
       setIsPasswordModalOpen(false);
@@ -151,18 +177,20 @@ export default function EditProfilePage() {
   };
 
   const handleGoBack = () => {
-    console.log("Navigate back to home");
-  };
+
+    navigate("/home")
+  }
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header */}
+      <Toaster />
+      
       <header className="bg-white border-b border-gray-200">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center h-16">
             <Button variant="ghost" onClick={handleGoBack} className="mr-4">
               <ArrowLeft className="w-4 h-4 mr-2" />
-              Back to Dashboard
+              Kembali ke beranda
             </Button>
             <div className="flex items-center space-x-2">
               <div className="w-8 h-8 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
@@ -191,9 +219,9 @@ export default function EditProfilePage() {
         {isSuccess && (
           <Alert className="mb-6 border-green-200 bg-green-50">
             <CheckCircle className="w-4 h-4 text-green-600" />
-            <AlertDescription className="text-green-800">
-              Your profile has been updated successfully!
-            </AlertDescription>
+
+            <AlertDescription className="text-green-800">Profile anda berhasil diperbaharui!</AlertDescription>
+
           </Alert>
         )}
 
@@ -204,7 +232,7 @@ export default function EditProfilePage() {
               <CardHeader>
                 <CardTitle className="flex items-center space-x-2">
                   <User className="w-5 h-5" />
-                  <span>Personal Information</span>
+                  <span>Informasi personal</span>
                 </CardTitle>
                 <CardDescription>
                   Update your personal details and profile picture.
@@ -230,17 +258,15 @@ export default function EditProfilePage() {
                       </Avatar>
                       <div className="flex-1">
                         <input
-                          id="profilePicture"
+                          id="image"
                           type="file"
                           accept="image/*"
-                          {...registerProfile("profilePicture")}
+                          {...registerProfile("image")}
                           onChange={handleImageChange}
                           className="hidden"
                         />
-                        <Label
-                          htmlFor="profilePicture"
-                          className="cursor-pointer"
-                        >
+                        <Label htmlFor="image" className="cursor-pointer">
+
                           <Button type="button" variant="outline" asChild>
                             <span>
                               <Upload className="w-4 h-4 mr-2" />
@@ -316,7 +342,6 @@ export default function EditProfilePage() {
                     )}
                   </div>
 
-                  {/* Date of Birth */}
                   <div className="space-y-2">
                     <Label
                       htmlFor="dateOfBirth"
@@ -478,9 +503,8 @@ export default function EditProfilePage() {
                                   "Password must be at least 8 characters",
                               },
                               pattern: {
-                                value: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/,
-                                message:
-                                  "Password must contain uppercase, lowercase, and number",
+                                value: /^(?=.*[A-Za-z])(?=.*\d)(?=.*[^A-Za-z\d])[A-Za-z\d\W_]+$/,
+                                message: "Password must contain alphabet, symbol, and number",
                               },
                             })}
                             className={
@@ -522,9 +546,6 @@ export default function EditProfilePage() {
                             placeholder="Confirm new password"
                             {...registerPassword("confirmPassword", {
                               required: "Please confirm your password",
-                              validate: (value) =>
-                                value === newPassword ||
-                                "Passwords do not match",
                             })}
                             className={
                               passwordErrors.confirmPassword

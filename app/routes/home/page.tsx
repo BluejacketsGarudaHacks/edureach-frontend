@@ -99,10 +99,12 @@ export default function HomePage({ loaderData }: Route.ComponentProps) {
               <Button variant="ghost" size="icon">
                 <Settings className="w-5 h-5" />
               </Button>
-              <Avatar className="w-8 h-8">
-                <AvatarImage src={profilePicture} />
-                <AvatarFallback>{avatarFallback}</AvatarFallback>
-              </Avatar>
+              <Link to="/profile">
+                <Avatar className="w-8 h-8">
+                  <AvatarImage src={profilePicture} />
+                  <AvatarFallback>{avatarFallback}</AvatarFallback>
+                </Avatar>
+              </Link>
               <Button variant="ghost" size="icon" onClick={logout}>
                 <LogOut className="w-5 h-5" />
               </Button>
