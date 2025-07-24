@@ -30,11 +30,12 @@ import {
   BookOpen,
 } from "lucide-react";
 import { useAuthGuard } from "~/lib/auth-middleware";
-import { getCommunities, getLocations } from "./api";
+import { getCommunities, getLocations, joinCommunity } from "./api";
 import type { Community } from "~/interfaces/community";
 import type { Location } from "~/interfaces/location";
 import { Link } from "react-router";
 import { useUser } from "~/hooks/useUser";
+import { toast, Toaster } from "sonner";
 
 const sortOptions = [
   { value: "members", label: "Most Members" },
@@ -48,9 +49,10 @@ export default function CommunityListPage() {
     window.document.title = "Jelajahi Komunitas | EduReach";
   }, []);
 
-  const { user } = useUser();
-
+  const { user, loading: userLoading } = useUser();
   const { isAuthenticated } = useAuthGuard();
+  
+  // All state hooks must be called before any conditional logic
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCities, setSelectedCities] = useState("Semua Kota");
   const [selectedProvince, setSelectedProvince] = useState("Semua Provinsi");
@@ -60,39 +62,9 @@ export default function CommunityListPage() {
   const [indonesianCities, setIndonesianCities] = useState<string[]>([]);
   const [indonesianProvinces, setIndonesianProvinces] = useState<string[]>([]);
   const [locations, setLocations] = useState<Location[]>([]);
+  const [dataLoading, setDataLoading] = useState(true);
 
-  useEffect(() => {
-    const token = localStorage.getItem("token");
-    if (token) {
-      getLocations(token).then((locations) => {
-        const cities = locations.map((loc) => loc.city);
-        const provinces = locations.map((loc) => loc.province);
-        setLocations(locations);
-        setIndonesianCities(["Semua Kota", ...new Set(cities)]);
-        setIndonesianProvinces(["Semua Provinsi", ...new Set(provinces)]);
-      });
-
-      getCommunities(token).then((communities) => {
-        communities.forEach((community) => {
-          community.volunteers = community.members.filter(
-            (member) => member.user.isVolunteer
-          );
-          community.isJoined =
-            community.members.filter((member) => member.userId == user?.id)
-              .length > 0;
-        });
-
-        setCommunities(communities);
-      });
-    }
-    console.log(token);
-  }, []);
-
-  // Don't render if not authenticated
-  if (!isAuthenticated()) {
-    return null;
-  }
-
+  // useMemo hook must also be called before conditional returns
   const filteredAndSortedCommunities = useMemo(() => {
     const filtered = communities.filter((community) => {
       const matchesSearch =
@@ -126,6 +98,79 @@ export default function CommunityListPage() {
 
     return filtered;
   }, [communities, searchQuery, selectedCities, selectedProvince, sortBy]);
+
+  useEffect(() => {
+    // Wait for user to be loaded before fetching data
+    if (userLoading) return;
+    
+    const token = localStorage.getItem("token");
+    if (token && user) {
+      console.log("Fetching data with user:", user);
+      
+      Promise.all([
+        getLocations(token),
+        getCommunities(token)
+      ]).then(([locations, communities]) => {
+        const cities = locations.map((loc) => loc.city);
+        const provinces = locations.map((loc) => loc.province);
+        setLocations(locations);
+        setIndonesianCities(["Semua Kota", ...new Set(cities)]);
+        setIndonesianProvinces(["Semua Provinsi", ...new Set(provinces)]);
+
+        communities.forEach((community) => {
+          community.volunteers = community.members.filter(
+            (member) => member.user.isVolunteer
+          );
+          community.isJoined =
+            community.members.filter((member) => member.userId == user?.id)
+              .length > 0 ||
+            community.volunteers.filter((member) => member.userId == user?.id)
+              .length > 0;
+        });
+
+        setCommunities(communities);
+        setDataLoading(false);
+      }).catch((error) => {
+        console.error("Failed to fetch community data:", error);
+        setDataLoading(false);
+      });
+    } else if (!userLoading && !user) {
+      // User loading finished but no user found
+      setDataLoading(false);
+    }
+  }, [user, userLoading]); // Depend on both user and userLoading
+
+  // Don't render if not authenticated
+  if (!isAuthenticated()) {
+    return null;
+  }
+
+  // Show loading state while user or data is loading
+  if (userLoading || dataLoading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading communities...</p>
+        </div>
+      </div>
+    );
+  }
+
+  const handleJoinCommunity = async (communityId: string) => {
+    const token = localStorage.getItem("token");
+    if (!token) return;
+
+    const response = await joinCommunity(communityId, user?.id || "", token);
+    toast(
+      response
+        ? "Bergabung dengan komunitas berhasil!"
+        : "Gagal bergabung dengan komunitas"
+    );
+    setTimeout(() => {
+      window.location.reload();
+    }, 2000);
+  };
 
   const handleChangeProvince = (value: string) => {
     setSelectedProvince(value);
@@ -195,7 +240,7 @@ export default function CommunityListPage() {
         </div>
 
         <Button
-          // onClick={() => handleJoinCommunity(community.id)}
+          onClick={() => handleJoinCommunity(community.id)}
           className={`w-full ${
             community.isJoined
               ? "bg-gray-100 text-gray-700 hover:bg-gray-200"
@@ -251,6 +296,7 @@ export default function CommunityListPage() {
 
               <Button
                 size="sm"
+                onClick={() => handleJoinCommunity(community.id)}
                 className={
                   community.isJoined
                     ? "bg-gray-100 text-gray-700 hover:bg-gray-200"
@@ -270,6 +316,7 @@ export default function CommunityListPage() {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
+      <Toaster />
       <header className="bg-white border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
