@@ -6,7 +6,7 @@ export const api = axios.create(
     }
 )
 
-axios.interceptors.response.use(function (response) {
+api.interceptors.response.use(function (response) {
     return response.data;
 }, function (error) {
     return Promise.reject(error);
