@@ -3,7 +3,7 @@
 import type React from "react"
 
 import { useForm } from "react-hook-form"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -17,6 +17,7 @@ import { createCommunity, type createCommunityInput } from "./api"
 import { toast } from "sonner"
 import axios from "axios"
 import { useAuthGuard } from "~/lib/auth-middleware"
+import { useEditor } from "@tiptap/react"
 
 const indonesianLocations = [
   "Jakarta",
@@ -52,6 +53,10 @@ const indonesianLocations = [
 ]
 
 export default function CreateCommunityPage() {
+  useEffect(() => {
+    window.document.title = "Buat Komunitas | EduReach"
+  }, [])
+
   const { isAuthenticated } = useAuthGuard();
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isSuccess, setIsSuccess] = useState(false)

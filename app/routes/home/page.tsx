@@ -30,6 +30,10 @@ import type { Route } from "./+types/page";
 import { useAuthGuard } from "~/lib/auth-middleware";
 
 export default function HomePage({ loaderData }: Route.ComponentProps) {
+  useEffect(() => {
+    window.document.title = "Home | EduReach";
+  }, []);
+
   const { isAuthenticated, logout } = useAuthGuard();
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [profilePicture, setProfilePicture] = useState("");
@@ -136,7 +140,8 @@ export default function HomePage({ loaderData }: Route.ComponentProps) {
             Welcome back, {currentUser?.fullName}! 👋
           </h1>
           <p className="text-gray-600">
-            Ready to continue your educational journey? Here's what you can do today.
+            Ready to continue your educational journey? Here's what you can do
+            today.
           </p>
         </div>
 
@@ -203,7 +208,8 @@ export default function HomePage({ loaderData }: Route.ComponentProps) {
                 Summarizer AI Multibahasa
               </CardTitle>
               <CardDescription className="text-gray-600">
-                Rangkum materi pembelajaran dalam bahasa Indonesia, Inggris, atau bahasa daerah dengan teknologi AI canggih.
+                Rangkum materi pembelajaran dalam bahasa Indonesia, Inggris,
+                atau bahasa daerah dengan teknologi AI canggih.
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
