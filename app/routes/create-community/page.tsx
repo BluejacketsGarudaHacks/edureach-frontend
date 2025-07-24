@@ -95,7 +95,7 @@ export default function CreateCommunityPage({loaderData}:Route.ComponentProps) {
     
     const token = window.localStorage.getItem("token")
     if (!token){
-      toast("Anda tidak diperbolehkan untuk memperbaharui profil anda")
+      toast("Anda tidak diperbolehkan untuk mendaftar komunitas")
       return
     }
     try {
