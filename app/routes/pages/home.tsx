@@ -47,7 +47,7 @@ export default function HomePage() {
                 <Settings className="w-5 h-5" />
               </Button>
               <Avatar className="w-8 h-8">
-                <AvatarImage src="/placeholder.svg?height=32&width=32" />
+                <AvatarImage src="/" />
                 <AvatarFallback>JD</AvatarFallback>
               </Avatar>
               <Button variant="ghost" size="icon">
@@ -119,17 +119,17 @@ export default function HomePage() {
               <div className="w-16 h-16 bg-gradient-to-r from-blue-500 to-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
                 <Zap className="w-8 h-8 text-white" />
               </div>
-              <CardTitle className="text-xl font-bold">Multilingual AI Summarizer</CardTitle>
+              <CardTitle className="text-xl font-bold">Summarizer AI Multibahasa</CardTitle>
               <CardDescription className="text-gray-600">
                 Summarize learning materials in Indonesian, English, or regional languages with advanced AI technology.
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="flex flex-wrap gap-2 justify-center">
-                <Badge variant="secondary">Indonesian</Badge>
-                <Badge variant="secondary">English</Badge>
-                <Badge variant="secondary">Javanese</Badge>
-                <Badge variant="secondary">Sundanese</Badge>
+                <Badge variant="secondary">Bahasa Indonesia</Badge>
+                <Badge variant="secondary">Inggris</Badge>
+                <Badge variant="secondary">Jawa</Badge>
+                <Badge variant="secondary">Sunda</Badge>
               </div>
               <Button className="w-full bg-blue-600 hover:bg-blue-700" onClick={handleSummarizeClick}>
                 <FileText className="w-4 h-4 mr-2" />
@@ -144,9 +144,9 @@ export default function HomePage() {
               <div className="w-16 h-16 bg-gradient-to-r from-purple-500 to-purple-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
                 <Users className="w-8 h-8 text-white" />
               </div>
-              <CardTitle className="text-xl font-bold">Volunteer Teacher Community</CardTitle>
+              <CardTitle className="text-xl font-bold">Komunitas Belajar</CardTitle>
               <CardDescription className="text-gray-600">
-                Join the Indonesian educator community and become a volunteer teacher to share knowledge with others.
+                Bergabung atau buat komunitas belajar untuk berbagi ilmu dan pengalaman dengan pendidik lain di Indonesia.
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
