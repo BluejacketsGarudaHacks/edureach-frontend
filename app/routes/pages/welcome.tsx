@@ -46,8 +46,8 @@ export default function WelcomePage() {
         </h1>
 
         <p className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto leading-relaxed">
-          Revolusi pendidikan Indonesia dengan platform AI yang menghubungkan siswa, guru, dan komunitas dalam
-          pengalaman belajar yang bermakna dan dapat diakses oleh semua.
+          Revolutionizing Indonesian education with an AI platform that connects students, teachers, and communities in
+          meaningful and accessible learning experiences for everyone.
         </p>
 
         <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
@@ -62,22 +62,22 @@ export default function WelcomePage() {
           </Link>
           <Button variant="outline" size="lg" className="px-8 py-3 bg-transparent">
             <Play className="w-4 h-4 mr-2" />
-            Lihat Demo
+            Watch Demo
           </Button>
         </div>
 
         <div className="flex flex-col sm:flex-row gap-8 justify-center items-center text-sm text-gray-600">
           <div className="flex items-center">
             <Star className="w-4 h-4 text-yellow-500 mr-1" />
-            <span className="font-semibold text-gray-900">4.8/5</span> dari 1,500+ pendidik Indonesia
+            <span className="font-semibold text-gray-900">4.8/5</span> from 1,500+ Indonesian educators
           </div>
           <div className="hidden sm:block w-1 h-1 bg-gray-300 rounded-full"></div>
           <div>
-            <span className="font-semibold text-gray-900">25,000+</span> siswa aktif
+            <span className="font-semibold text-gray-900">25,000+</span> active students
           </div>
           <div className="hidden sm:block w-1 h-1 bg-gray-300 rounded-full"></div>
           <div>
-            <span className="font-semibold text-gray-900">800+</span> sekolah di Indonesia
+            <span className="font-semibold text-gray-900">800+</span> schools in Indonesia
           </div>
         </div>
       </section>
@@ -85,10 +85,10 @@ export default function WelcomePage() {
       <section id="features" className="container mx-auto px-4 py-20">
         <div className="text-center mb-16">
           <h2 className="text-3xl md:text-4xl font-bold mb-4 text-gray-900">
-            Fitur Unggulan untuk Pendidikan Indonesia
+            Leading Features for Indonesian Education
           </h2>
           <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-            Teknologi AI dan komunitas yang kuat untuk mendukung pembelajaran yang merata di seluruh Indonesia.
+            AI technology and strong community to support equitable learning throughout Indonesia.
           </p>
         </div>
 
@@ -98,23 +98,22 @@ export default function WelcomePage() {
               <div className="w-16 h-16 bg-gradient-to-r from-blue-500 to-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-6">
                 <Zap className="w-8 h-8 text-white" />
               </div>
-              <h3 className="text-xl font-semibold mb-4 text-gray-900">AI Summarizer Multibahasa</h3>
+              <h3 className="text-xl font-semibold mb-4 text-gray-900">Multilingual AI Summarizer</h3>
               <p className="text-gray-600 leading-relaxed mb-4">
-                Rangkum materi pembelajaran dalam bahasa Indonesia, Inggris, atau bahasa daerah dengan teknologi AI
-                canggih.
+                Summarize learning materials in Indonesian, English, or regional languages with advanced AI technology.
               </p>
               <div className="flex flex-wrap gap-2 justify-center">
                 <Badge variant="secondary" className="text-xs">
-                  Bahasa Indonesia
+                  Indonesian
                 </Badge>
                 <Badge variant="secondary" className="text-xs">
                   English
                 </Badge>
                 <Badge variant="secondary" className="text-xs">
-                  Bahasa Jawa
+                  Javanese
                 </Badge>
                 <Badge variant="secondary" className="text-xs">
-                  Bahasa Sunda
+                  Sundanese
                 </Badge>
               </div>
             </CardContent>
@@ -125,66 +124,23 @@ export default function WelcomePage() {
               <div className="w-16 h-16 bg-gradient-to-r from-purple-500 to-purple-600 rounded-2xl flex items-center justify-center mx-auto mb-6">
                 <Users className="w-8 h-8 text-white" />
               </div>
-              <h3 className="text-xl font-semibold mb-4 text-gray-900">Komunitas Guru Relawan</h3>
+              <h3 className="text-xl font-semibold mb-4 text-gray-900">Volunteer Teacher Community</h3>
               <p className="text-gray-600 leading-relaxed mb-4">
-                Bergabung dengan komunitas pendidik Indonesia dan jadilah guru relawan untuk berbagi ilmu dengan sesama.
+                Join the Indonesian educator community and become a volunteer teacher to share knowledge with others.
               </p>
               <div className="flex flex-wrap gap-2 justify-center">
                 <Badge variant="secondary" className="text-xs">
-                  Mengajar Gratis
+                  Free Teaching
                 </Badge>
                 <Badge variant="secondary" className="text-xs">
-                  Komunitas Aktif
+                  Active Community
                 </Badge>
                 <Badge variant="secondary" className="text-xs">
-                  Sertifikat
+                  Certification
                 </Badge>
               </div>
             </CardContent>
           </Card>
-        </div>
-      </section>
-
-      <section className="bg-gradient-to-r from-blue-600 to-purple-600 py-20">
-        <div className="container mx-auto px-4">
-          <div className="grid md:grid-cols-2 gap-12 items-center">
-            <div>
-              <h2 className="text-3xl md:text-4xl font-bold text-white mb-6">
-                Mengapa EduReach dipilih pendidik Indonesia
-              </h2>
-              <div className="space-y-4">
-                <div className="flex items-start space-x-3">
-                  <CheckCircle className="w-6 h-6 text-green-300 mt-0.5 flex-shrink-0" />
-                  <div>
-                    <h3 className="font-semibold text-white">Mudah digunakan</h3>
-                    <p className="text-blue-100">Interface dalam bahasa Indonesia yang mudah dipahami</p>
-                  </div>
-                </div>
-                <div className="flex items-start space-x-3">
-                  <CheckCircle className="w-6 h-6 text-green-300 mt-0.5 flex-shrink-0" />
-                  <div>
-                    <h3 className="font-semibold text-white">Sesuai kurikulum Indonesia</h3>
-                    <p className="text-blue-100">Mendukung Kurikulum Merdeka dan kurikulum nasional</p>
-                  </div>
-                </div>
-                <div className="flex items-start space-x-3">
-                  <CheckCircle className="w-6 h-6 text-green-300 mt-0.5 flex-shrink-0" />
-                  <div>
-                    <h3 className="font-semibold text-white">Komunitas lokal</h3>
-                    <p className="text-blue-100">Terhubung dengan pendidik dan siswa di seluruh Indonesia</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-8 text-center">
-              <div className="text-4xl font-bold text-white mb-2">30 Hari</div>
-              <div className="text-blue-100 mb-6">Gratis Tanpa Batas</div>
-              <Button size="lg" className="bg-white text-blue-600 hover:bg-gray-100 w-full">
-                Coba Gratis Sekarang
-              </Button>
-              <p className="text-sm text-blue-100 mt-4">Tanpa kartu kredit • Akses penuh</p>
-            </div>
-          </div>
         </div>
       </section>
 
@@ -210,7 +166,7 @@ export default function WelcomePage() {
             </div>
           </div>
           <div className="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400">
-            <p>&copy; 2024 EduReach. All rights reserved.</p>
+            <p>&copy; 2025 EduReach. All rights reserved.</p>
           </div>
         </div>
       </footer>
