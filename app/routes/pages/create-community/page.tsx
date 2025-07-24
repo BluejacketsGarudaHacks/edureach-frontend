@@ -13,13 +13,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { ArrowLeft, Upload, Users, MapPin, FileText, ImageIcon, CheckCircle } from "lucide-react"
 import { useNavigate } from "react-router"
-
-interface CommunityFormData {
-  name: string
-  description: string
-  location: string
-  image: FileList
-}
+import { createCommunity, type createCommunityInput } from "./api"
+import { toast } from "sonner"
+import axios from "axios"
 
 const indonesianLocations = [
   "Jakarta",
@@ -68,9 +64,9 @@ export default function CreateCommunityPage() {
     watch,
     formState: { errors },
     reset,
-  } = useForm<CommunityFormData>()
+  } = useForm<createCommunityInput>()
 
-  const watchedLocation = watch("location")
+  const watchedLocation = watch("locationid")
   const watchedImage = watch("image")
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -84,23 +80,25 @@ export default function CreateCommunityPage() {
     }
   }
 
-  const onSubmit = async (data: CommunityFormData) => {
+  const onSubmit = async (data: createCommunityInput) => {
     setIsSubmitting(true)
-
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 2000))
-
+    try {
+      await createCommunity({data})
+    } catch (error) {
+      if (axios.isAxiosError(error)){
+            toast("Pendaftaran komunitas gagal. " + error.message)
+        }
+    }
     console.log("Community Data:", {
       name: data.name,
       description: data.description,
-      location: data.location,
-      image: data.image[0]?.name || "No image selected",
+      location: data.locationid,
+      image: data.image.name || "No image selected",
     })
 
     setIsSubmitting(false)
     setIsSuccess(true)
 
-    // Reset form after success
     setTimeout(() => {
       setIsSuccess(false)
       reset()
@@ -120,12 +118,12 @@ export default function CreateCommunityPage() {
             <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
               <CheckCircle className="w-8 h-8 text-green-600" />
             </div>
-            <h2 className="text-2xl font-bold text-gray-900 mb-2">Community Created!</h2>
+            <h2 className="text-2xl font-bold text-gray-900 mb-2">Komunitas berhasil terbuat!</h2>
             <p className="text-gray-600 mb-6">
-              Your community has been successfully created and is now live for others to join.
+              Komunitas anda berhasil terbuat dan terbuka untuk diikuti.
             </p>
             <Button onClick={handleGoBack} className="w-full">
-              Return to Dashboard
+              Kembali ke Dashboard
             </Button>
           </CardContent>
         </Card>
@@ -141,7 +139,7 @@ export default function CreateCommunityPage() {
           <div className="flex items-center h-16">
             <Button variant="ghost" onClick={handleGoBack} className="mr-4">
               <ArrowLeft className="w-4 h-4 mr-2" />
-              Back to Dashboard
+              Kembali ke dashboard
             </Button>
             <div className="flex items-center space-x-2">
               <div className="w-8 h-8 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
@@ -158,7 +156,7 @@ export default function CreateCommunityPage() {
       {/* Main Content */}
       <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Create New Community</h1>
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">Membuat komunitas baru</h1>
           <p className="text-gray-600">
             Build a learning community to connect educators and students across Indonesia.
           </p>
@@ -234,8 +232,8 @@ export default function CreateCommunityPage() {
                       <MapPin className="w-4 h-4" />
                       <span>Location *</span>
                     </Label>
-                    <Select onValueChange={(value) => setValue("location", value)}>
-                      <SelectTrigger className={errors.location ? "border-red-500" : ""}>
+                    <Select onValueChange={(value) => setValue("locationid", value)}>
+                      <SelectTrigger className={errors.locationid ? "border-red-500" : ""}>
                         <SelectValue placeholder="Select a city in Indonesia" />
                       </SelectTrigger>
                       <SelectContent>
@@ -248,11 +246,11 @@ export default function CreateCommunityPage() {
                     </Select>
                     <input
                       type="hidden"
-                      {...register("location", {
+                      {...register("locationid", {
                         required: "Please select a location",
                       })}
                     />
-                    {errors.location && <p className="text-sm text-red-600">{errors.location.message}</p>}
+                    {errors.locationid && <p className="text-sm text-red-600">{errors.locationid.message}</p>}
                   </div>
 
                   {/* Image Upload */}
