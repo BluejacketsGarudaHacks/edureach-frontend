@@ -2,6 +2,7 @@ import { Button } from "../../components/ui/button"
 import { Card, CardContent } from "../../components/ui/card"
 import { Badge } from "../../components/ui/badge"
 import { BookOpen, Users, Zap, ArrowRight, Play, Star, CheckCircle } from "lucide-react"
+import { Link } from "react-router"
 
 export default function WelcomePage() {
   return (
@@ -23,9 +24,11 @@ export default function WelcomePage() {
             <a href="#about" className="text-gray-600 hover:text-gray-900 transition-colors">
               About
             </a>
-            <Button variant="outline" size="sm">
-              Sign In
-            </Button>
+            <Link to={"/auth/login"}>
+                <Button variant="outline" size="sm">
+                Sign In
+                </Button>
+            </Link>
           </div>
         </nav>
       </header>
@@ -48,13 +51,15 @@ export default function WelcomePage() {
         </p>
 
         <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
-          <Button
-            size="lg"
-            className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-8 py-3"
-          >
-            Mulai Gratis Sekarang
-            <ArrowRight className="w-4 h-4 ml-2" />
-          </Button>
+          <Link to="/auth/register">
+            <Button
+                size="lg"
+                className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-8 py-3"
+            >
+                Get Started
+                <ArrowRight className="w-4 h-4 ml-2" />
+            </Button>
+          </Link>
           <Button variant="outline" size="lg" className="px-8 py-3 bg-transparent">
             <Play className="w-4 h-4 mr-2" />
             Lihat Demo
