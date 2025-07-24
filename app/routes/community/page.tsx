@@ -1,10 +1,10 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   BookOpen,
   ArrowLeft,
@@ -20,56 +20,58 @@ import {
   User,
   Video,
   FileText,
-} from "lucide-react"
-import Loading from "~/components/ui/loading"
-import { api } from "~/util/apiClient"
-import { getCommunity } from "./api"
-import type { Route } from "./+types/page"
+} from "lucide-react";
+import Loading from "~/components/ui/loading";
+import { api } from "~/util/apiClient";
+import { getCommunity } from "./api";
+import type { Route } from "./+types/page";
+import { Link, NavLink } from "react-router";
+import ScheduleManager from "./schedule-manager";
 
 interface CommunityMember {
-  id: string
-  name: string
-  role: "creator" | "volunteer" | "member"
-  avatar: string
-  joinDate: string
-  contributionScore: number
-  isOnline: boolean
-  specialties?: string[]
-  bio?: string
+  id: string;
+  name: string;
+  role: "creator" | "volunteer" | "member";
+  avatar: string;
+  joinDate: string;
+  contributionScore: number;
+  isOnline: boolean;
+  specialties?: string[];
+  bio?: string;
 }
 
 interface Schedule {
-  id: string
-  title: string
-  description: string
-  volunteerId: string
-  volunteerName: string
-  date: string
-  time: string
-  duration: string
-  type: "study_session" | "discussion" | "workshop" | "q_and_a"
-  maxParticipants: number
-  currentParticipants: number
-  isRecurring: boolean
-  meetingLink?: string
+  id: string;
+  title: string;
+  description: string;
+  volunteerId: string;
+  volunteerName: string;
+  date: string;
+  time: string;
+  duration: string;
+  type: "study_session" | "discussion" | "workshop" | "q_and_a";
+  maxParticipants: number;
+  currentParticipants: number;
+  isRecurring: boolean;
+  meetingLink?: string;
 }
 
 interface CommunityDetail {
-  id: string
-  name: string
-  description: string
-  location: string
-  image: string
-  memberCount: number
-  activeMembers: number
-  rating: number
-  category: string
-  level: string
-  tags: string[]
-  createdDate: string
-  rules: string[]
-  members: CommunityMember[]
-  schedules: Schedule[]
+  id: string;
+  name: string;
+  description: string;
+  location: string;
+  image: string;
+  memberCount: number;
+  activeMembers: number;
+  rating: number;
+  category: string;
+  level: string;
+  tags: string[];
+  createdDate: string;
+  rules: string[];
+  members: CommunityMember[];
+  schedules: Schedule[];
 }
 
 // Mock data for demonstration
@@ -163,7 +165,8 @@ const mockCommunityDetail: CommunityDetail = {
     {
       id: "1",
       title: "Belajar Kalkulus Dasar",
-      description: "Pengenalan konsep limit, turunan, dan integral untuk pemula",
+      description:
+        "Pengenalan konsep limit, turunan, dan integral untuk pemula",
       volunteerId: "1",
       volunteerName: "Pak Budi Santoso",
       date: "2024-01-28",
@@ -178,7 +181,8 @@ const mockCommunityDetail: CommunityDetail = {
     {
       id: "2",
       title: "Diskusi Soal UTBK Matematika",
-      description: "Pembahasan soal-soal UTBK tahun sebelumnya dan tips mengerjakan",
+      description:
+        "Pembahasan soal-soal UTBK tahun sebelumnya dan tips mengerjakan",
       volunteerId: "3",
       volunteerName: "Kak Dimas",
       date: "2024-01-29",
@@ -208,7 +212,8 @@ const mockCommunityDetail: CommunityDetail = {
     {
       id: "4",
       title: "Sesi Tanya Jawab Mingguan",
-      description: "Sesi terbuka untuk bertanya tentang materi matematika apapun",
+      description:
+        "Sesi terbuka untuk bertanya tentang materi matematika apapun",
       volunteerId: "1",
       volunteerName: "Pak Budi Santoso",
       date: "2024-01-31",
@@ -235,54 +240,58 @@ const mockCommunityDetail: CommunityDetail = {
       meetingLink: "https://meet.google.com/olim-piad-math",
     },
   ],
-}
+};
 
-
-export const clientLoader = async ({params}:Route.ClientLoaderArgs) => {
-
-  let token = localStorage.getItem('token')
-  if (!token) return null
+export const clientLoader = async ({ params }: Route.ClientLoaderArgs) => {
+  let token = localStorage.getItem("token");
+  if (!token) return null;
 
   try {
-    let response = await getCommunity({id:params.id,token})
-    return response
+    let response = await getCommunity({ id: params.id, token });
+    return response;
   } catch (error) {
-    console.log(error)
-    return null
+    console.log(error);
+    return null;
   }
-}
+};
 
 export function HydrateFallback() {
   return <Loading />;
 }
 
-export default function CommunityDetailPage({ loaderData }: Route.ComponentProps) {
-    const community = loaderData
-    const [activeTab, setActiveTab] = useState("overview")
+export default function CommunityDetailPage({
+  loaderData,
+}: Route.ComponentProps) {
+  const community = loaderData;
+  const [activeTab, setActiveTab] = useState("overview");
 
-    if (!community) return null
+  if (!community) return null;
 
   const getRoleIcon = (role: boolean) => {
-    return role? <Shield className="w-4 h-4 text-blue-600" />:<User className="w-4 h-4 text-gray-600" />
-  }
+    return role ? (
+      <Shield className="w-4 h-4 text-blue-600" />
+    ) : (
+      <User className="w-4 h-4 text-gray-600" />
+    );
+  };
 
   const getRoleLabel = (role: boolean) => {
-    return role?"Relawan":"Anggota"
-  }
+    return role ? "Relawan" : "Anggota";
+  };
 
   const getRoleColor = (role: boolean) => {
-    return role?"bg-blue-100 text-blue-800":"bg-gray-100 text-gray-800"
-  }
+    return role ? "bg-blue-100 text-blue-800" : "bg-gray-100 text-gray-800";
+  };
 
   const formatDate = (dateString: string) => {
-    const date = new Date(dateString)
+    const date = new Date(dateString);
     return date.toLocaleDateString("id-ID", {
       weekday: "long",
       year: "numeric",
       month: "long",
       day: "numeric",
-    })
-  }
+    });
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
@@ -320,7 +329,10 @@ export default function CommunityDetailPage({ loaderData }: Route.ComponentProps
         <Card className="mb-8 shadow-lg border-0 overflow-hidden">
           <div className="relative">
             <img
-              src={`${import.meta.env.VITE_BACKEND_URL}${community.imagePath}` || "/placeholder.svg"}
+              src={
+                `${import.meta.env.VITE_BACKEND_URL}${community.imagePath}` ||
+                "/placeholder.svg"
+              }
               alt={community.name}
               className="w-full h-64 object-cover"
             />
@@ -329,7 +341,7 @@ export default function CommunityDetailPage({ loaderData }: Route.ComponentProps
               <div className="flex items-center space-x-4 text-sm">
                 <div className="flex items-center">
                   <MapPin className="w-4 h-4 mr-1" />
-                  <span>{community.location.city}</span>
+                  <span>{community.location.city} </span>
                 </div>
                 <div className="flex items-center">
                   <Users className="w-4 h-4 mr-1" />
@@ -347,15 +359,28 @@ export default function CommunityDetailPage({ loaderData }: Route.ComponentProps
         </Card>
 
         {/* Community Navigation */}
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
+        <Tabs
+          value={activeTab}
+          onValueChange={setActiveTab}
+          className="space-y-6"
+        >
           <TabsList className="grid w-full grid-cols-3 bg-white border border-gray-200 rounded-lg p-1">
-            <TabsTrigger value="overview" className="data-[state=active]:bg-blue-600 data-[state=active]:text-white">
+            <TabsTrigger
+              value="overview"
+              className="data-[state=active]:bg-blue-600 data-[state=active]:text-white"
+            >
               Informasi
             </TabsTrigger>
-            <TabsTrigger value="members" className="data-[state=active]:bg-blue-600 data-[state=active]:text-white">
+            <TabsTrigger
+              value="members"
+              className="data-[state=active]:bg-blue-600 data-[state=active]:text-white"
+            >
               Anggota
             </TabsTrigger>
-            <TabsTrigger value="schedules" className="data-[state=active]:bg-blue-600 data-[state=active]:text-white">
+            <TabsTrigger
+              value="schedules"
+              className="data-[state=active]:bg-blue-600 data-[state=active]:text-white"
+            >
               Jadwal
             </TabsTrigger>
           </TabsList>
@@ -370,10 +395,11 @@ export default function CommunityDetailPage({ loaderData }: Route.ComponentProps
                     <CardTitle>Tentang Komunitas</CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <p className="text-gray-700 leading-relaxed mb-4">{community.description}</p>
+                    <p className="text-gray-700 leading-relaxed mb-4">
+                      {community.description}
+                    </p>
                   </CardContent>
                 </Card>
-
               </div>
 
               <div className="space-y-6">
@@ -385,7 +411,9 @@ export default function CommunityDetailPage({ loaderData }: Route.ComponentProps
                   <CardContent className="space-y-4">
                     <div className="flex justify-between items-center">
                       <span className="text-gray-600">Total Anggota</span>
-                      <span className="font-semibold">{community.members.length.toLocaleString()}</span>
+                      <span className="font-semibold">
+                        {community.members.length.toLocaleString()}
+                      </span>
                     </div>
                   </CardContent>
                 </Card>
@@ -397,33 +425,49 @@ export default function CommunityDetailPage({ loaderData }: Route.ComponentProps
           <TabsContent value="members" className="space-y-6">
             <Card className="shadow-lg border-0">
               <CardHeader>
-                <CardTitle>Anggota Komunitas ({community.members.length})</CardTitle>
+                <CardTitle>
+                  Anggota Komunitas ({community.members.length})
+                </CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                   {community.members.map((member) => (
-                    <Card key={member.user.id} className="border border-gray-200 hover:shadow-md transition-shadow">
+                    <Card
+                      key={member.user.id}
+                      className="border border-gray-200 hover:shadow-md transition-shadow"
+                    >
                       <CardContent className="p-4">
                         <div className="flex items-start space-x-3">
                           <div className="relative">
                             <img
-                              src={`${import.meta.env.VITE_BACKEND_URL}${member.user.imagePath}` || "/placeholder.svg"}
+                              src={
+                                `${import.meta.env.VITE_BACKEND_URL}${
+                                  member.user.imagePath
+                                }` || "/placeholder.svg"
+                              }
                               alt={member.user.fullName}
                               className="w-12 h-12 rounded-full object-cover"
-                            />  
-                            
+                            />
                           </div>
                           <div className="flex-1 min-w-0">
                             <div className="flex items-center space-x-2 mb-1">
                               {getRoleIcon(member.user.isVolunteer)}
-                              <h3 className="font-semibold text-sm truncate border">{member.user.email}</h3>
+                              <h3 className="font-semibold text-sm truncate border">
+                                {member.user.email}
+                              </h3>
                             </div>
-                            <Badge className={`${getRoleColor(member.user.isVolunteer)} text-xs mb-2`}>
+                            <Badge
+                              className={`${getRoleColor(
+                                member.user.isVolunteer
+                              )} text-xs mb-2`}
+                            >
                               {getRoleLabel(member.user.isVolunteer)}
                             </Badge>
-                            
+
                             <div className="flex justify-between items-center mt-2 text-xs text-gray-500">
-                              <span>Bergabung {formatDate(member.createdAt)}</span>
+                              <span>
+                                Bergabung {formatDate(member.createdAt)}
+                              </span>
                             </div>
                           </div>
                         </div>
@@ -436,82 +480,11 @@ export default function CommunityDetailPage({ loaderData }: Route.ComponentProps
           </TabsContent>
 
           {/* Schedules Tab */}
-          {/* <TabsContent value="schedules" className="space-y-6">
-            <Card className="shadow-lg border-0">
-              <CardHeader>
-                <CardTitle>Jadwal Kegiatan ({community.schedules.length})</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  {community.schedules.map((schedule) => (
-                    <Card key={schedule.id} className="border border-gray-200 hover:shadow-md transition-shadow">
-                      <CardContent className="p-6">
-                        <div className="flex items-start justify-between mb-4">
-                          <div className="flex-1">
-                            <div className="flex items-center space-x-2 mb-2">
-                              
-                              <h3 className="font-semibold text-lg">{schedule.title}</h3>
-                              {schedule.isRecurring && (
-                                <Badge variant="outline" className="text-xs">
-                                  Berulang
-                                </Badge>
-                              )}
-                            </div>
-                            <p className="text-gray-600 mb-3">{schedule.description}</p>
-                            <div className="flex items-center space-x-4 text-sm text-gray-600 mb-3">
-                              <div className="flex items-center">
-                                <Calendar className="w-4 h-4 mr-1" />
-                                <span>{formatDate(schedule.date)}</span>
-                              </div>
-                              <div className="flex items-center">
-                                <Clock className="w-4 h-4 mr-1" />
-                                <span>
-                                  {schedule.time} ({schedule.duration})
-                                </span>
-                              </div>
-                              <div className="flex items-center">
-                                <Users className="w-4 h-4 mr-1" />
-                                <span>
-                                  {schedule.currentParticipants}/{schedule.maxParticipants} peserta
-                                </span>
-                              </div>
-                            </div>
-                            <div className="flex items-center space-x-2 text-sm">
-                              <span className="text-gray-600">Relawan:</span>
-                              <span className="font-medium">{schedule.volunteerName}</span>
-                            </div>
-                          </div>
-                          <div className="flex flex-col space-y-2 ml-4">
-                            <Button size="sm" className="bg-blue-600 hover:bg-blue-700">
-                              Daftar
-                            </Button>
-                            {schedule.meetingLink && (
-                              <Button size="sm" variant="outline" asChild>
-                                <a href={schedule.meetingLink} target="_blank" rel="noopener noreferrer">
-                                  <Video className="w-4 h-4 mr-2" />
-                                  Link
-                                </a>
-                              </Button>
-                            )}
-                          </div>
-                        </div>
-                        <div className="w-full bg-gray-200 rounded-full h-2">
-                          <div
-                            className="bg-blue-600 h-2 rounded-full"
-                            style={{
-                              width: `${(schedule.currentParticipants / schedule.maxParticipants) * 100}%`,
-                            }}
-                          ></div>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent> */}
+          <TabsContent value="schedules" className="space-y-6">
+            <ScheduleManager communityId={community.id} />
+          </TabsContent>
         </Tabs>
       </div>
     </div>
-  )
+  );
 }
