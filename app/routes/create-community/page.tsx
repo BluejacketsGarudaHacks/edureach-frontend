@@ -279,8 +279,8 @@ export default function CreateCommunityPage() {
                             <p className="text-sm text-gray-600">Click to change image</p>
                           </div>
                         ) : (
-                          <div className="space-y-2">
-                            <Upload className="w-8 h-8 text-gray-400 mx-auto" />
+                          <div className="flex items-center gap-5 space-y-2">
+                            <Upload className="w-8 h-8 text-gray-400 mx-auto m-0" />
                             <div>
                               <p className="text-sm font-medium text-gray-900">Click to upload an image</p>
                               <p className="text-sm text-gray-500">PNG, JPG, GIF up to 10MB</p>

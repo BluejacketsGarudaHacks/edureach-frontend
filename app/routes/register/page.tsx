@@ -1,8 +1,8 @@
-import { Button } from "../../../components/ui/button"
+import { Button } from "../../components/ui/button"
 import { ArrowLeft } from "lucide-react"
-import { LoginForm } from "./component/form"
+import { RegisterForm } from "./component/form"
 
-export default function LoginPage() {
+export default function RegisterPage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 flex items-center justify-center p-4">
       <div className="absolute inset-0 bg-grid-pattern opacity-5"></div>
@@ -15,7 +15,7 @@ export default function LoginPage() {
       </Button>
 
       <div className="w-full max-w-md relative z-10">
-        <LoginForm />
+        <RegisterForm  />
       </div>
 
       <div className="absolute top-20 left-20 w-32 h-32 bg-gradient-to-r from-blue-400 to-purple-400 rounded-full opacity-10 blur-xl"></div>
