@@ -12,6 +12,7 @@ import { useForm } from "react-hook-form"
 import { loginInputSchema, type loginInput } from "../api"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "~/components/ui/form"
+import Logo from "~/components/logo"
 
 export function LoginForm() {
   const [showPassword, setShowPassword] = useState(false)
@@ -32,7 +33,7 @@ export function LoginForm() {
         <CardHeader className="text-center pb-6">
           <div className="flex items-center justify-center space-x-2 mb-4">
             <div className="w-10 h-10 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
-              <BookOpen className="w-6 h-6 text-white" />
+              <Logo />  
             </div>
             <span className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
               EduReach

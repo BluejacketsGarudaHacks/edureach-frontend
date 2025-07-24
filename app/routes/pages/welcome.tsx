@@ -3,6 +3,7 @@ import { Card, CardContent } from "../../components/ui/card"
 import { Badge } from "../../components/ui/badge"
 import { BookOpen, Users, Zap, ArrowRight, Play, Star, CheckCircle } from "lucide-react"
 import { Link } from "react-router"
+import Logo from "~/components/logo"
 
 export default function WelcomePage() {
   return (
@@ -10,9 +11,7 @@ export default function WelcomePage() {
       <header className="container mx-auto px-4 py-6">
         <nav className="flex items-center justify-between">
           <div className="flex items-center space-x-2">
-            <div className="w-8 h-8 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
-              <BookOpen className="w-5 h-5 text-white" />
-            </div>
+            <Logo />
             <span className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
               EduReach
             </span>
@@ -148,9 +147,7 @@ export default function WelcomePage() {
         <div className="container mx-auto px-4">
           <div className="flex flex-col md:flex-row justify-between items-center">
             <div className="flex items-center space-x-2 mb-4 md:mb-0">
-              <div className="w-8 h-8 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
-                <BookOpen className="w-5 h-5 text-white" />
-              </div>
+              <Logo />
               <span className="text-2xl font-bold">EduReach</span>
             </div>
             <div className="flex space-x-6 text-sm">
