@@ -11,5 +11,5 @@ export const loginInputSchema = z.object({
 export type loginInput = z.infer  <typeof loginInputSchema>
  
 export const login = async ({data}:{data: loginInput}):Promise<string> => {
-    return api.post('/login', data)
+    return api.post('user/login', data)
 }

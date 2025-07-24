@@ -13,6 +13,7 @@ import { Form, FormControl, FormField, FormItem, FormMessage } from "~/component
 import Logo from "~/components/logo"
 import { toast, Toaster } from "sonner"
 import axios from "axios"
+import { useNavigate } from "react-router"
 
 export function LoginForm() {
   const [showPassword, setShowPassword] = useState(false)
@@ -23,14 +24,20 @@ export function LoginForm() {
       password: "",
     }
   })
+  const navigate = useNavigate()
 
   const handleSubmit = async  (data:loginInput) => {
       try {
         let response = await login({data})
         toast("Login success. redirecting to homepage")
+        setTimeout(() => {
+          navigate("/home")
+        }, 2000);
       } catch (error) {
         if (axios.isAxiosError(error)){
-          toast("Login error. " + error.message)
+          if (error.response){
+            toast("Login error. " + error.response.statusText)
+          }
         }
       }
   }
