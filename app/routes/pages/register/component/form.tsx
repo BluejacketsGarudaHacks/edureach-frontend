@@ -14,6 +14,7 @@ import { register, registerInputSchema, type RegisterInput } from "../api"
 import { Form, FormControl, FormField, FormItem, FormMessage } from "~/components/ui/form"
 import { toast, Toaster } from "sonner"
 import axios from "axios"
+import { useNavigate } from "react-router"
 
 
 export function RegisterForm() {
@@ -29,16 +30,20 @@ export function RegisterForm() {
             confirmPassword: "",
             dateOfBirth: ""
         }
-        })
-  
+    })
+  const navigate = useNavigate()
+
   const handleSubmit = async (data:RegisterInput) => {
       try {
         let response = await register({data})
         
-        toast("Register success. redirecting to homepage")
+        toast("Pendaftaran berhasil.")
+        setTimeout(() => {
+            navigate("/auth/login")
+        }, 3000);
     } catch (error) {
         if (axios.isAxiosError(error)){
-            toast("Register error. " + error.message)
+            toast("Pendaftaran gagal. " + error.message)
         }
     }
   }
@@ -179,13 +184,13 @@ export function RegisterForm() {
                         <FormItem>
                             <FormControl>
                             <div className="relative">
-                                <Input placeholder="Masukkan password konfirmasi disini" {...field} type={showPassword?"":"password"}/>
+                                <Input placeholder="Masukkan password konfirmasi disini" {...field} type={showConfirmPassword?"":"password"}/>
                                 <button
                                 type="button"
-                                onClick={() => setShowPassword(!showPassword)}
+                                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                                 className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700"
                                 >
-                                {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                                {showConfirmPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                                 </button>
                             </div>
                             </FormControl>
@@ -197,8 +202,8 @@ export function RegisterForm() {
             </div>
             <div className="flex items-center justify-between text-sm">
                 <label className="flex items-center space-x-2 cursor-pointer">
-                <input type="checkbox" className="rounded border-gray-300" />
-                <span className="text-gray-600">Daftar sebagai volunteer</span>
+                    <input type="checkbox" className="rounded border-gray-300" />
+                    <span className="text-gray-600">Daftar sebagai volunteer</span>
                 </label>
             </div>
 
