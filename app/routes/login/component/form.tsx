@@ -1,5 +1,3 @@
-"use client";
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -14,6 +12,7 @@ import {
 import { Eye, EyeOff } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { login, loginInputSchema, type loginInput } from "../api";
+import { getUserProfile } from "~/api/user";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
   Form,
@@ -26,9 +25,11 @@ import Logo from "~/components/logo";
 import { toast, Toaster } from "sonner";
 import axios from "axios";
 import { useNavigate } from "react-router";
+import { useUser } from "~/hooks/useUser";
 
 export function LoginForm() {
   const [showPassword, setShowPassword] = useState(false);
+  const { setUser } = useUser();
   let form = useForm<loginInput>({
     resolver: zodResolver(loginInputSchema),
     defaultValues: {
@@ -42,10 +43,22 @@ export function LoginForm() {
     try {
       let response = await login({ data });
       localStorage.setItem('token', response.data);
-      toast("Berhasil masuk");
-      setTimeout(() => {
-        navigate("/home");
-      }, 2000);
+      
+      // Fetch user profile after successful login
+      try {
+        const user = await getUserProfile(response.data);
+        setUser(user);
+        toast("Berhasil masuk!");
+        setTimeout(() => {
+          navigate("/home");
+        }, 1000);
+      } catch (profileError) {
+        console.error("Failed to fetch user profile:", profileError);
+        toast("Login berhasil, tapi gagal mengambil data profil");
+        setTimeout(() => {
+          navigate("/home");
+        }, 1000);
+      }
     } catch (error) {
       if (axios.isAxiosError(error)) {
         if (error.response) {

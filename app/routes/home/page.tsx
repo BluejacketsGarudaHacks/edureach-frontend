@@ -28,16 +28,23 @@ import { getCurrentUser } from "./api";
 import type { User } from "~/interfaces/user";
 import type { Route } from "./+types/page";
 import { useAuthGuard } from "~/lib/auth-middleware";
+import { useUser } from "~/hooks/useUser";
 
 export default function HomePage({ loaderData }: Route.ComponentProps) {
   useEffect(() => {
     window.document.title = "Home | EduReach";
   }, []);
 
-  const { isAuthenticated, logout } = useAuthGuard();
-  const [currentUser, setCurrentUser] = useState<User | null>(null);
+  const { isAuthenticated, logout: authLogout } = useAuthGuard();
+  const { user, setUser, clearUser } = useUser();
   const [profilePicture, setProfilePicture] = useState("");
   const [avatarFallback, setAvatarFallback] = useState("XX");
+
+  // Custom logout that clears user context
+  const logout = () => {
+    clearUser();
+    authLogout();
+  };
 
   // Don't render if not authenticated
   if (!isAuthenticated()) {
@@ -50,7 +57,7 @@ export default function HomePage({ loaderData }: Route.ComponentProps) {
       getCurrentUser(token).then((user) => {
         if (user) {
           console.log(user);
-          setCurrentUser(user);
+          setUser(user);
           setProfilePicture(
             user.imagePath !== ""
               ? `${import.meta.env.VITE_BACKEND_URL}${user.imagePath}`
@@ -69,34 +76,6 @@ export default function HomePage({ loaderData }: Route.ComponentProps) {
       });
     }
   }, []);
-
-  const handleSummarizeClick = () => {
-    // Navigate to summarize page
-    console.log("Navigate to summarize page");
-  };
-
-  const handleJoinCommunity = () => {
-    // Handle join community action
-    console.log("Join community clicked");
-  };
-
-  const handleCreateCommunity = () => {
-    // Handle create community action
-    console.log("Create community clicked");
-  };
-
-  // useEffect(() => {
-  //   getCurrentUser()
-  //     .then(user => {
-  //       console.log(user);
-  //       if (user) {
-  //         setProfilePicture(`${import.meta.env.VITE_BACKEND_URL}${user.imagePath}` || "");
-  //         setAvatarFallback(user.fullName ? user.fullName.split(" ").map(n => n[0]).join("") : "XX");
-  //       } else {
-  //         // TODO: Handle case where user is not logged in
-  //       }
-  //     })
-  // }, [])
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -139,11 +118,11 @@ export default function HomePage({ loaderData }: Route.ComponentProps) {
         {/* Welcome Section */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900 mb-2">
-            Welcome back, {currentUser?.fullName}! 👋
+            Selamat datang, {user?.fullName}! 👋
           </h1>
           <p className="text-gray-600">
-            Ready to continue your educational journey? Here's what you can do
-            today.
+            Siap melanjutkan perjalanan Anda? Berikut yang bisa Anda lakukan
+            hari ini.
           </p>
         </div>
 
@@ -154,7 +133,7 @@ export default function HomePage({ loaderData }: Route.ComponentProps) {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm font-medium text-gray-600">
-                    Documents Summarized
+                    Dokumen yang Diringkas
                   </p>
                   <p className="text-2xl font-bold text-gray-900">12</p>
                 </div>
@@ -170,7 +149,7 @@ export default function HomePage({ loaderData }: Route.ComponentProps) {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm font-medium text-gray-600">
-                    Communities Joined
+                    Komunitas yang Diikuti
                   </p>
                   <p className="text-2xl font-bold text-gray-900">3</p>
                 </div>
@@ -180,22 +159,6 @@ export default function HomePage({ loaderData }: Route.ComponentProps) {
               </div>
             </CardContent>
           </Card>
-
-          {/* <Card>
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-gray-600">
-                    Learning Hours
-                  </p>
-                  <p className="text-2xl font-bold text-gray-900">24</p>
-                </div>
-                <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
-                  <BookOpen className="w-6 h-6 text-green-600" />
-                </div>
-              </div>
-            </CardContent>
-          </Card> */}
         </div>
 
         {/* Main Features */}
@@ -226,12 +189,9 @@ export default function HomePage({ loaderData }: Route.ComponentProps) {
                 <Badge variant="secondary">Minang</Badge>
               </div>
               <Link to={"/summarizer"}>
-                <Button
-                  className="w-full bg-blue-600 hover:bg-blue-700"
-                  onClick={handleSummarizeClick}
-                >
+                <Button className="w-full bg-blue-600 hover:bg-blue-700">
                   <FileText className="w-4 h-4 mr-2" />
-                  Summarize Document
+                  Ringkas Dokumen
                 </Button>
               </Link>
             </CardContent>
@@ -253,92 +213,34 @@ export default function HomePage({ loaderData }: Route.ComponentProps) {
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="flex flex-wrap gap-2 justify-center">
-                <Badge variant="secondary">Free Teaching</Badge>
-                <Badge variant="secondary">Active Community</Badge>
-                <Badge variant="secondary">Certification</Badge>
+                <Badge variant="secondary">Pengajaran Gratis</Badge>
+                <Badge variant="secondary">Komunitas Aktif</Badge>
+                <Badge variant="secondary">Sertifikasi</Badge>
+                <Badge variant="secondary">Perluas Koneksi</Badge>
               </div>
-              <div className="space-y-2">
-                <Button
-                  className="w-full bg-purple-600 hover:bg-purple-700"
-                  onClick={handleJoinCommunity}
-                >
-                  <UserPlus className="w-4 h-4 mr-2" />
-                  Join Community
-                </Button>
-                <Button
-                  variant="outline"
-                  className="w-full bg-transparent"
-                  onClick={handleCreateCommunity}
-                >
-                  <Link
-                    to="/create-community"
-                    className="flex items-center content-center"
-                  >
+              <div className="flex flex-col gap-2">
+                <Link to={"/community"}>
+                  <Button className="w-full bg-purple-600 hover:bg-purple-700">
+                    <UserPlus className="w-4 h-4 mr-2" />
+                    Jelajahi Komunitas
+                  </Button>
+                </Link>
+                <Link to="/create-community">
+                  <Button variant="outline" className="w-full bg-transparent">
                     <Plus className="w-4 h-4 mr-2" />
-                    Create Community
-                  </Link>
-                </Button>
+                    Buat Komunitas Baru
+                  </Button>
+                </Link>
               </div>
             </CardContent>
           </Card>
-
-          {/* Recent Activity */}
-          {/* <Card>
-            <CardHeader>
-              <CardTitle className="text-xl font-bold">
-                Recent Activity
-              </CardTitle>
-              <CardDescription>
-                Your latest interactions and progress
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="space-y-3">
-                <div className="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg">
-                  <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
-                    <FileText className="w-4 h-4 text-blue-600" />
-                  </div>
-                  <div className="flex-1">
-                    <p className="text-sm font-medium">
-                      Summarized "Math Basics"
-                    </p>
-                    <p className="text-xs text-gray-500">2 hours ago</p>
-                  </div>
-                </div>
-
-                <div className="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg">
-                  <div className="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center">
-                    <Users className="w-4 h-4 text-purple-600" />
-                  </div>
-                  <div className="flex-1">
-                    <p className="text-sm font-medium">
-                      Joined "Jakarta Teachers"
-                    </p>
-                    <p className="text-xs text-gray-500">1 day ago</p>
-                  </div>
-                </div>
-
-                <div className="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg">
-                  <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
-                    <BookOpen className="w-4 h-4 text-green-600" />
-                  </div>
-                  <div className="flex-1">
-                    <p className="text-sm font-medium">Completed lesson</p>
-                    <p className="text-xs text-gray-500">3 days ago</p>
-                  </div>
-                </div>
-              </div>
-            </CardContent>
-          </Card> */}
         </div>
 
         {/* My Communities */}
         <Card>
           <CardHeader>
-            <CardTitle className="text-xl font-bold">My Communities</CardTitle>
-            <CardDescription>
-              Communities you've joined or created
-            </CardDescription>
+            <CardTitle className="text-xl font-bold">Komunitas Saya</CardTitle>
+            <CardDescription>Komunitas yang telah Anda ikuti</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
