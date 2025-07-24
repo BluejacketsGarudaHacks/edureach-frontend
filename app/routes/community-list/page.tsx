@@ -151,7 +151,7 @@ export default function CommunityListPage() {
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading communities...</p>
+          <p className="text-gray-600">Memuat komunitas...</p>
         </div>
       </div>
     );
@@ -191,10 +191,6 @@ export default function CommunityListPage() {
       ]);
     }
     setSelectedCities("Semua Kota"); // Reset city filter when province changes
-  };
-
-  const handleGoBack = () => {
-    console.log("Navigate back to home");
   };
 
   const CommunityCard = ({ community }: { community: Community }) => (
@@ -322,7 +318,7 @@ export default function CommunityListPage() {
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center">
               <Link to={"/home"}>
-                <Button variant="ghost" onClick={handleGoBack} className="mr-4">
+                <Button variant="ghost" className="mr-4">
                   <ArrowLeft className="w-4 h-4 mr-2" />
                   Kembali ke dashboard
                 </Button>
