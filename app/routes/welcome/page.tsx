@@ -15,9 +15,12 @@ import {
 } from "lucide-react";
 import { Link } from "react-router";
 import Logo from "~/components/logo";
+import { useEffect } from "react";
 
 export default function WelcomePage() {
-  window.document.title = "EduReach";
+  useEffect(() => {
+    window.document.title = "EduReach";
+  }, []);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">

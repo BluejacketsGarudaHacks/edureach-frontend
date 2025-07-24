@@ -6,7 +6,9 @@ import { useEffect } from "react";
 import { checkAuth } from "~/lib/auth-loader";
 
 export default function LoginPage() {
-  window.document.title = "Login | EduReach";
+  useEffect(() => {
+    window.document.title = "Login | EduReach";
+  }, []);
 
   const nav = useNavigate();
 
