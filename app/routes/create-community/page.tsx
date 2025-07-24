@@ -18,41 +18,35 @@ import { toast } from "sonner"
 import axios from "axios"
 import { useAuthGuard } from "~/lib/auth-middleware"
 import { useEditor } from "@tiptap/react"
+import type { Route } from "./+types/page"
+import type { Location } from "~/interfaces/location"
 
-const indonesianLocations = [
-  "Jakarta",
-  "Surabaya",
-  "Bandung",
-  "Medan",
-  "Semarang",
-  "Makassar",
-  "Palembang",
-  "Tangerang",
-  "Depok",
-  "Bekasi",
-  "Bogor",
-  "Batam",
-  "Pekanbaru",
-  "Bandar Lampung",
-  "Malang",
-  "Yogyakarta",
-  "Solo",
-  "Denpasar",
-  "Balikpapan",
-  "Samarinda",
-  "Pontianak",
-  "Manado",
-  "Mataram",
-  "Kupang",
-  "Jayapura",
-  "Ambon",
-  "Banda Aceh",
-  "Padang",
-  "Jambi",
-  "Bengkulu",
-]
 
-export default function CreateCommunityPage() {
+export const clientLoader = async () => {
+
+  let indonesianLocations:Location[] = []
+
+  let token = localStorage.getItem('token')
+  if (!token) return indonesianLocations
+
+  try {
+    let response = await axios.get<Location[]>(`${import.meta.env.VITE_BACKEND_URL}/api/location`, {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    })
+    return response.data
+  } catch (error) {
+    console.log(error)
+    return indonesianLocations
+  }
+}
+
+export function HydrateFallback() {
+  return <div>Loading...</div>;
+}
+
+export default function CreateCommunityPage({loaderData}:Route.ComponentProps) {
   useEffect(() => {
     window.document.title = "Buat Komunitas | EduReach"
   }, [])
@@ -61,8 +55,11 @@ export default function CreateCommunityPage() {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isSuccess, setIsSuccess] = useState(false)
   const [selectedImage, setSelectedImage] = useState<string | null>(null)
+  const [selectedFile, setSelectedFile] = useState<File | null>(null)
 
   const navigate = useNavigate();
+
+  let indonesianLocations = loaderData
 
   // Don't render if not authenticated
   if (!isAuthenticated()) {
@@ -84,6 +81,7 @@ export default function CreateCommunityPage() {
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     if (file) {
+      setSelectedFile(file)
       const reader = new FileReader()
       reader.onload = (e) => {
         setSelectedImage(e.target?.result as string)
@@ -95,18 +93,15 @@ export default function CreateCommunityPage() {
   const onSubmit = async (data: createCommunityInput) => {
     setIsSubmitting(true)
     try {
+      data.image = selectedFile!
       await createCommunity({data})
     } catch (error) {
       if (axios.isAxiosError(error)){
             toast("Pendaftaran komunitas gagal. " + error.message)
+            setIsSubmitting(false)
+            return
         }
     }
-    console.log("Community Data:", {
-      name: data.name,
-      description: data.description,
-      location: data.locationid,
-      image: data.image.name || "No image selected",
-    })
 
     setIsSubmitting(false)
     setIsSuccess(true)
@@ -249,9 +244,9 @@ export default function CreateCommunityPage() {
                         <SelectValue placeholder="Select a city in Indonesia" />
                       </SelectTrigger>
                       <SelectContent>
-                        {indonesianLocations.map((location) => (
-                          <SelectItem key={location} value={location}>
-                            {location}
+                        {indonesianLocations.map((loc) => (
+                          <SelectItem key={loc.id} value={loc.id}>
+                            {loc.city}
                           </SelectItem>
                         ))}
                       </SelectContent>
@@ -354,7 +349,7 @@ export default function CreateCommunityPage() {
                   <h3 className="font-semibold text-gray-900">{watch("name") || "Community Name"}</h3>
                   <p className="text-sm text-gray-500 flex items-center mt-1">
                     <MapPin className="w-3 h-3 mr-1" />
-                    {watchedLocation || "Location"}
+                    {indonesianLocations.find(e => e.id == watchedLocation)?.city || "Location"}
                   </p>
                   <p className="text-sm text-gray-600 mt-2">
                     {watch("description") || "Community description will appear here..."}

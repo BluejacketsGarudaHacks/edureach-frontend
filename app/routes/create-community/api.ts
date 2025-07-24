@@ -12,10 +12,10 @@ export type createCommunityInput = z.infer<typeof createCommunityInputSchema>
 
 export const createCommunity = ({data}:{data:createCommunityInput}) => {
     let formData = new FormData();
-    formData.append('name', data.name)
-    formData.append('description', data.name)
-    formData.append('locationId', data.locationid)
-    formData.append('image', data.image)
+    formData.append('Name', data.name)
+    formData.append('Description', data.name)
+    formData.append('LocationId', data.locationid)
+    formData.append('Image', data.image)
 
     
     return api.post('community', formData, {
