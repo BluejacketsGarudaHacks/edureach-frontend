@@ -122,7 +122,7 @@ export function RegisterForm() {
                 render={({ field }) => (
                     <FormItem>
                         <FormControl>
-                            <div class="relative">
+                            <div className="relative">
                                 <Input
                                     id="dateOfBirth"
                                     placeholder="Masukkan tanggal lahir"
