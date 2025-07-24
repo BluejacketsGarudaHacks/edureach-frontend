@@ -1,18 +1,18 @@
 "use client"
 
-import type React from "react"
-
 import { useState } from "react"
-import { Button } from "../../../../components/ui/button"
-import { Input } from "../../../../components/ui/input"
-import { Label } from "../../../../components/ui/label"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../../../../components/ui/card"
-import { BookOpen, Eye, EyeOff } from "lucide-react"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Eye, EyeOff } from "lucide-react"
 import { useForm } from "react-hook-form"
-import { loginInputSchema, type loginInput } from "../api"
+import { login, loginInputSchema, type loginInput } from "../api"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "~/components/ui/form"
+import { Form, FormControl, FormField, FormItem, FormMessage } from "~/components/ui/form"
 import Logo from "~/components/logo"
+import { toast, Toaster } from "sonner"
+import axios from "axios"
 
 export function LoginForm() {
   const [showPassword, setShowPassword] = useState(false)
@@ -24,12 +24,20 @@ export function LoginForm() {
     }
   })
 
-  const handleSubmit = (data:loginInput) => {
-
+  const handleSubmit = async  (data:loginInput) => {
+      try {
+        let response = await login({data})
+        toast("Login success. redirecting to homepage")
+      } catch (error) {
+        if (axios.isAxiosError(error)){
+          toast("Login error. " + error.message)
+        }
+      }
   }
 
   return (
       <Card className="w-full max-w-md shadow-xl border-0">
+        <Toaster />
         <CardHeader className="text-center pb-6">
           <div className="flex items-center justify-center space-x-2 mb-4">
             <div className="w-10 h-10 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
@@ -70,18 +78,20 @@ export function LoginForm() {
                     name="password"
                     
                     render={({ field }) => (
-                      <FormItem className="relative">
+                      <FormItem>
                         <FormControl>
-                          <Input placeholder="Masukkan password disini" {...field} type={showPassword?"":"password"}/>
+                          <div className="relative">
+                            <Input placeholder="Masukkan password disini" {...field} type={showPassword?"":"password"}/>
+                            <button
+                              type="button"
+                              onClick={() => setShowPassword(!showPassword)}
+                              className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700"
+                            >
+                              {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                            </button>
+                          </div>
                         </FormControl>
-                        <button
-                          type="button"
-                          onClick={() => setShowPassword(!showPassword)}
-                          className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700"
-                        >
                         <FormMessage />
-                          {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                        </button>
                       </FormItem>
                     )}
                   />
