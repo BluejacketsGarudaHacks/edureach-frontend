@@ -15,6 +15,7 @@ import {
   type ICreateSchedule,
   type Schedule,
 } from "./api";
+import { useUser } from "~/hooks/useUser";
 
 interface I {
   communityId: string;
@@ -27,6 +28,7 @@ export default function ScheduleManager({ communityId }: I) {
     time: "",
   });
   const [X, setX] = useState(0);
+  const { user } = useUser();
 
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -100,45 +102,47 @@ export default function ScheduleManager({ communityId }: I) {
     <div className="w-full max-w-6xl mx-auto">
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Create Schedule Form */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Calendar className="h-5 w-5" />
-              Create New Schedule
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="date">Date *</Label>
-                  <Input
-                    id="date"
-                    name="date"
-                    type="date"
-                    value={formData.date}
-                    onChange={handleInputChange}
-                    required
-                  />
+        {user?.isVolunteer ? (
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Calendar className="h-5 w-5" />
+                Create New Schedule
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <form onSubmit={handleSubmit} className="space-y-4">
+                <div className="space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="date">Date *</Label>
+                    <Input
+                      id="date"
+                      name="date"
+                      type="date"
+                      value={formData.date}
+                      onChange={handleInputChange}
+                      required
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="time">Time *</Label>
+                    <Input
+                      id="time"
+                      name="time"
+                      type="time"
+                      value={formData.time}
+                      onChange={handleInputChange}
+                      required
+                    />
+                  </div>
                 </div>
-                <div className="space-y-2">
-                  <Label htmlFor="time">Time *</Label>
-                  <Input
-                    id="time"
-                    name="time"
-                    type="time"
-                    value={formData.time}
-                    onChange={handleInputChange}
-                    required
-                  />
-                </div>
-              </div>
-              <Button type="submit" className="w-full">
-                Create Schedule
-              </Button>
-            </form>
-          </CardContent>
-        </Card>
+                <Button type="submit" className="w-full">
+                  Create Schedule
+                </Button>
+              </form>
+            </CardContent>
+          </Card>
+        ) : null}
 
         {/* Schedule List */}
         <div className="space-y-4">
