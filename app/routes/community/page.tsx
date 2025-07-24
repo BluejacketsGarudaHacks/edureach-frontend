@@ -21,6 +21,10 @@ import {
   Video,
   FileText,
 } from "lucide-react"
+import Loading from "~/components/ui/loading"
+import { api } from "~/util/apiClient"
+import { getCommunity } from "./api"
+import type { Route } from "./+types/page"
 
 interface CommunityMember {
   id: string
@@ -233,13 +237,30 @@ const mockCommunityDetail: CommunityDetail = {
   ],
 }
 
-interface CommunityDetailPageProps {
-  communityId: string
+
+export const clientLoader = async ({params}:Route.ClientLoaderArgs) => {
+
+  let token = localStorage.getItem('token')
+  if (!token) return null
+
+  try {
+    let response = await getCommunity({id:params.id,token})
+    return response
+  } catch (error) {
+    console.log(error)
+    return null
+  }
 }
 
-export default function CommunityDetailPage({ communityId }: CommunityDetailPageProps) {
-  const [community] = useState<CommunityDetail>(mockCommunityDetail)
-  const [activeTab, setActiveTab] = useState("overview")
+export function HydrateFallback() {
+  return <Loading />;
+}
+
+export default function CommunityDetailPage({ loaderData }: Route.ComponentProps) {
+    const community = loaderData
+    const [activeTab, setActiveTab] = useState("overview")
+
+    if (!community) return null
 
   const getRoleIcon = (role: string) => {
     switch (role) {
@@ -275,51 +296,6 @@ export default function CommunityDetailPage({ communityId }: CommunityDetailPage
         return "bg-blue-100 text-blue-800"
       case "member":
         return "bg-gray-100 text-gray-800"
-      default:
-        return "bg-gray-100 text-gray-800"
-    }
-  }
-
-  const getTypeIcon = (type: string) => {
-    switch (type) {
-      case "study_session":
-        return <BookOpen className="w-4 h-4" />
-      case "discussion":
-        return <MessageCircle className="w-4 h-4" />
-      case "workshop":
-        return <FileText className="w-4 h-4" />
-      case "q_and_a":
-        return <Users className="w-4 h-4" />
-      default:
-        return <Calendar className="w-4 h-4" />
-    }
-  }
-
-  const getTypeLabel = (type: string) => {
-    switch (type) {
-      case "study_session":
-        return "Sesi Belajar"
-      case "discussion":
-        return "Diskusi"
-      case "workshop":
-        return "Workshop"
-      case "q_and_a":
-        return "Tanya Jawab"
-      default:
-        return type
-    }
-  }
-
-  const getTypeColor = (type: string) => {
-    switch (type) {
-      case "study_session":
-        return "bg-green-100 text-green-800"
-      case "discussion":
-        return "bg-blue-100 text-blue-800"
-      case "workshop":
-        return "bg-purple-100 text-purple-800"
-      case "q_and_a":
-        return "bg-orange-100 text-orange-800"
       default:
         return "bg-gray-100 text-gray-800"
     }
@@ -371,7 +347,7 @@ export default function CommunityDetailPage({ communityId }: CommunityDetailPage
         <Card className="mb-8 shadow-lg border-0 overflow-hidden">
           <div className="relative">
             <img
-              src={community.image || "/placeholder.svg"}
+              src={`${import.meta.env.VITE_BACKEND_URL}${community?.imagePath}` || "/placeholder.svg"}
               alt={community.name}
               className="w-full h-64 object-cover"
             />
@@ -381,15 +357,11 @@ export default function CommunityDetailPage({ communityId }: CommunityDetailPage
               <div className="flex items-center space-x-4 text-sm">
                 <div className="flex items-center">
                   <MapPin className="w-4 h-4 mr-1" />
-                  <span>{community.location}</span>
+                  <span>{community.location.city}</span>
                 </div>
                 <div className="flex items-center">
                   <Users className="w-4 h-4 mr-1" />
-                  <span>{community.memberCount.toLocaleString()} anggota</span>
-                </div>
-                <div className="flex items-center">
-                  <Star className="w-4 h-4 mr-1 text-yellow-400" />
-                  <span>{community.rating}</span>
+                  <span>{community.members.length} anggota</span>
                 </div>
               </div>
             </div>
@@ -427,13 +399,6 @@ export default function CommunityDetailPage({ communityId }: CommunityDetailPage
                   </CardHeader>
                   <CardContent>
                     <p className="text-gray-700 leading-relaxed mb-4">{community.description}</p>
-                    <div className="flex flex-wrap gap-2">
-                      {community.tags.map((tag, index) => (
-                        <Badge key={index} variant="secondary">
-                          {tag}
-                        </Badge>
-                      ))}
-                    </div>
                   </CardContent>
                 </Card>
 
@@ -448,11 +413,7 @@ export default function CommunityDetailPage({ communityId }: CommunityDetailPage
                   <CardContent className="space-y-4">
                     <div className="flex justify-between items-center">
                       <span className="text-gray-600">Total Anggota</span>
-                      <span className="font-semibold">{community.memberCount.toLocaleString()}</span>
-                    </div>
-                    <div className="flex justify-between items-center">
-                      <span className="text-gray-600">Dibuat</span>
-                      <span className="font-semibold">{community.createdDate}</span>
+                      <span className="font-semibold">{community.members.length.toLocaleString()}</span>
                     </div>
                   </CardContent>
                 </Card>
@@ -461,7 +422,7 @@ export default function CommunityDetailPage({ communityId }: CommunityDetailPage
           </TabsContent>
 
           {/* Members Tab */}
-          <TabsContent value="members" className="space-y-6">
+          {/* <TabsContent value="members" className="space-y-6">
             <Card className="shadow-lg border-0">
               <CardHeader>
                 <CardTitle>Anggota Komunitas ({community.members.length})</CardTitle>
@@ -469,18 +430,16 @@ export default function CommunityDetailPage({ communityId }: CommunityDetailPage
               <CardContent>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                   {community.members.map((member) => (
-                    <Card key={member.id} className="border border-gray-200 hover:shadow-md transition-shadow">
+                    <Card key={member.user.id} className="border border-gray-200 hover:shadow-md transition-shadow">
                       <CardContent className="p-4">
                         <div className="flex items-start space-x-3">
                           <div className="relative">
                             <img
-                              src={member.avatar || "/placeholder.svg"}
-                              alt={member.name}
+                              src={`${import.meta.env.VITE_BACKEND_URL}${member.user.imagePath}` || "/placeholder.svg"}
+                              alt={member.user.fullName}
                               className="w-12 h-12 rounded-full object-cover"
                             />
-                            {member.isOnline && (
-                              <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 border-2 border-white rounded-full"></div>
-                            )}
+                            
                           </div>
                           <div className="flex-1 min-w-0">
                             <div className="flex items-center space-x-2 mb-1">
@@ -517,10 +476,10 @@ export default function CommunityDetailPage({ communityId }: CommunityDetailPage
                 </div>
               </CardContent>
             </Card>
-          </TabsContent>
+          </TabsContent> */}
 
           {/* Schedules Tab */}
-          <TabsContent value="schedules" className="space-y-6">
+          {/* <TabsContent value="schedules" className="space-y-6">
             <Card className="shadow-lg border-0">
               <CardHeader>
                 <CardTitle>Jadwal Kegiatan ({community.schedules.length})</CardTitle>
@@ -533,9 +492,8 @@ export default function CommunityDetailPage({ communityId }: CommunityDetailPage
                         <div className="flex items-start justify-between mb-4">
                           <div className="flex-1">
                             <div className="flex items-center space-x-2 mb-2">
-                              {getTypeIcon(schedule.type)}
+                              
                               <h3 className="font-semibold text-lg">{schedule.title}</h3>
-                              <Badge className={getTypeColor(schedule.type)}>{getTypeLabel(schedule.type)}</Badge>
                               {schedule.isRecurring && (
                                 <Badge variant="outline" className="text-xs">
                                   Berulang
@@ -594,7 +552,7 @@ export default function CommunityDetailPage({ communityId }: CommunityDetailPage
                 </div>
               </CardContent>
             </Card>
-          </TabsContent>
+          </TabsContent> */}
         </Tabs>
       </div>
     </div>
