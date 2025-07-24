@@ -92,9 +92,15 @@ export default function CreateCommunityPage({loaderData}:Route.ComponentProps) {
 
   const onSubmit = async (data: createCommunityInput) => {
     setIsSubmitting(true)
+    
+    const token = window.localStorage.getItem("token")
+    if (!token){
+      toast("Anda tidak diperbolehkan untuk memperbaharui profil anda")
+      return
+    }
     try {
       data.image = selectedFile!
-      await createCommunity({data})
+      await createCommunity({data, token})
     } catch (error) {
       if (axios.isAxiosError(error)){
             toast("Pendaftaran komunitas gagal. " + error.message)
@@ -244,7 +250,7 @@ export default function CreateCommunityPage({loaderData}:Route.ComponentProps) {
                         <SelectValue placeholder="Select a city in Indonesia" />
                       </SelectTrigger>
                       <SelectContent>
-                        {indonesianLocations.map((loc) => (
+                        {indonesianLocations.sort((a,b) => a.city.localeCompare(b.city)).map((loc) => (
                           <SelectItem key={loc.id} value={loc.id}>
                             {loc.city}
                           </SelectItem>

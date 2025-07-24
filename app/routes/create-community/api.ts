@@ -10,7 +10,7 @@ export const createCommunityInputSchema = z.object({
 
 export type createCommunityInput = z.infer<typeof createCommunityInputSchema>
 
-export const createCommunity = ({data}:{data:createCommunityInput}) => {
+export const createCommunity = ({data, token}:{data:createCommunityInput, token: string}) => {
     let formData = new FormData();
     formData.append('Name', data.name)
     formData.append('Description', data.name)
@@ -20,7 +20,8 @@ export const createCommunity = ({data}:{data:createCommunityInput}) => {
     
     return api.post('community', formData, {
         headers: {
-            "Content-Type": "multipart/form-data"
+            "Content-Type": "multipart/form-data",
+            "Authorization": `Bearer ${token}`
         }
     })
 }
