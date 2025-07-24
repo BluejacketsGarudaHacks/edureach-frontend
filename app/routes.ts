@@ -15,5 +15,5 @@ export default [
     route("/create-community", "routes/create-community/page.tsx"),
     route("/profile", "routes/profile/page.tsx"),
     route("/community", "routes/community-list/page.tsx"),
-    route("/summarizer", "routes/summarizer/page.tsx")
+    route("/summarizer", "routes/summarizer/page.tsx"),
 ] satisfies RouteConfig;

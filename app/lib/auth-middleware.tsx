@@ -6,11 +6,11 @@ export function useAuthGuard() {
 
   useEffect(() => {
     // Only run on client side
-    if (typeof window !== 'undefined') {
-      const token = localStorage.getItem('token');
-      
+    if (typeof window !== "undefined") {
+      const token = localStorage.getItem("token");
+
       if (!token) {
-        navigate('/auth/login', { replace: true });
+        navigate("/auth/login", { replace: true });
       }
     }
   }, [navigate]);
@@ -18,17 +18,17 @@ export function useAuthGuard() {
   // Return whether user is authenticated
   const isAuthenticated = () => {
     // Check if we're on the client side
-    if (typeof window === 'undefined') {
+    if (typeof window === "undefined") {
       return false; // Assume not authenticated on server side
     }
-    return !!localStorage.getItem('token');
+    return !!localStorage.getItem("token");
   };
 
   // Logout function
   const logout = () => {
-    if (typeof window !== 'undefined') {
-      localStorage.removeItem('token');
-      navigate('/auth/login', { replace: true });
+    if (typeof window !== "undefined") {
+      localStorage.removeItem("token");
+      navigate("/auth/login", { replace: true });
     }
   };
 
@@ -36,10 +36,12 @@ export function useAuthGuard() {
 }
 
 // Higher-order component for protecting routes
-export function withAuthGuard<T extends object>(Component: React.ComponentType<T>) {
+export function withAuthGuard<T extends object>(
+  Component: React.ComponentType<T>
+) {
   return function AuthGuardedComponent(props: T) {
     const { isAuthenticated } = useAuthGuard();
-    
+
     // Don't render the component if not authenticated
     // The useAuthGuard hook will handle the redirect
     if (!isAuthenticated()) {
@@ -53,17 +55,17 @@ export function withAuthGuard<T extends object>(Component: React.ComponentType<T
 // Utility functions that can be used anywhere
 export const authUtils = {
   isAuthenticated: () => {
-    if (typeof window === 'undefined') return false;
-    return !!localStorage.getItem('token');
+    if (typeof window === "undefined") return false;
+    return !!localStorage.getItem("token");
   },
   logout: () => {
-    if (typeof window !== 'undefined') {
-      localStorage.removeItem('token');
-      window.location.href = '/auth/login';
+    if (typeof window !== "undefined") {
+      localStorage.removeItem("token");
+      window.location.href = "/auth/login";
     }
   },
   getToken: () => {
-    if (typeof window === 'undefined') return null;
-    return localStorage.getItem('token');
+    if (typeof window === "undefined") return null;
+    return localStorage.getItem("token");
   },
 };
