@@ -5,5 +5,6 @@ export default [
     ...prefix("/auth", [
         route("/login", "routes/pages/login/page.tsx"),
         route("/register", "routes/pages/register/page.tsx")
-    ])
+    ]),
+    route("/home", "routes/pages/home.tsx")
 ] satisfies RouteConfig;
