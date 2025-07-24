@@ -7,5 +7,6 @@ export default [
         route("/register", "routes/pages/register/page.tsx")
     ]),
     route("/home", "routes/pages/home.tsx"),
-    route("/create-community", "routes/pages/create-community/page.tsx")
+    route("/create-community", "routes/pages/create-community/page.tsx"),
+    route("/profile", "routes/pages/profile/page.tsx"),
 ] satisfies RouteConfig;
