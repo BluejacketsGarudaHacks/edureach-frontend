@@ -20,6 +20,7 @@ import { useAuthGuard } from "~/lib/auth-middleware"
 import { useEditor } from "@tiptap/react"
 import type { Route } from "./+types/page"
 import type { Location } from "~/interfaces/location"
+import Loading from "~/components/ui/loading"
 
 
 export const clientLoader = async () => {
@@ -43,7 +44,7 @@ export const clientLoader = async () => {
 }
 
 export function HydrateFallback() {
-  return <div>Loading...</div>;
+  return <Loading />;
 }
 
 export default function CreateCommunityPage({loaderData}:Route.ComponentProps) {
@@ -95,7 +96,7 @@ export default function CreateCommunityPage({loaderData}:Route.ComponentProps) {
     
     const token = window.localStorage.getItem("token")
     if (!token){
-      toast("Anda tidak diperbolehkan untuk memperbaharui profil anda")
+      toast("Anda tidak diperbolehkan untuk mendaftar komunitas")
       return
     }
     try {
