@@ -5,6 +5,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Zap, Users, FileText, Plus, UserPlus, BookOpen, Bell, Settings, LogOut } from "lucide-react"
+import Logo from "~/components/logo"
+import { Link } from "react-router"
 
 export default function HomePage() {
   const handleSummarizeClick = () => {
@@ -30,9 +32,7 @@ export default function HomePage() {
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center space-x-4">
               <div className="flex items-center space-x-2">
-                <div className="w-8 h-8 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
-                  <BookOpen className="w-5 h-5 text-white" />
-                </div>
+                <Logo />
                 <span className="text-xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
                   EduReach
                 </span>
@@ -161,8 +161,10 @@ export default function HomePage() {
                   Join Community
                 </Button>
                 <Button variant="outline" className="w-full bg-transparent" onClick={handleCreateCommunity}>
+                  <Link to="/create-community" className="flex items-center content-center">
                   <Plus className="w-4 h-4 mr-2" />
                   Create Community
+                  </Link>
                 </Button>
               </div>
             </CardContent>

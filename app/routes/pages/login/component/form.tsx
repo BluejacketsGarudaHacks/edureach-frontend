@@ -8,6 +8,7 @@ import { Input } from "../../../../components/ui/input"
 import { Label } from "../../../../components/ui/label"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../../../../components/ui/card"
 import { BookOpen, Eye, EyeOff } from "lucide-react"
+import Logo from "~/components/logo"
 
 export function Form() {
   const [showPassword, setShowPassword] = useState(false)
@@ -33,9 +34,7 @@ export function Form() {
     <Card className="w-full max-w-md shadow-xl border-0">
       <CardHeader className="text-center pb-6">
         <div className="flex items-center justify-center space-x-2 mb-4">
-          <div className="w-10 h-10 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
-            <BookOpen className="w-6 h-6 text-white" />
-          </div>
+          <Logo />
           <span className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
             EduReach
           </span>
