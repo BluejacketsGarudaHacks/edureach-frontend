@@ -54,6 +54,8 @@ function useTiptapEditor(): Editor | null {
 }
 
 export default function SummarizerPage() {
+  window.document.title = "Summarizer AI | EduReach";
+
   const [isClient, setIsClient] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);

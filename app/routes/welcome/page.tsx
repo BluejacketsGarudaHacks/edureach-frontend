@@ -17,6 +17,8 @@ import { Link } from "react-router";
 import Logo from "~/components/logo";
 
 export default function WelcomePage() {
+  window.document.title = "EduReach";
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
       <header className="container mx-auto px-4 py-6">

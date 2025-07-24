@@ -52,6 +52,8 @@ const indonesianLocations = [
 ]
 
 export default function CreateCommunityPage() {
+  window.document.title = "Buat Komunitas | EduReach"
+
   const { isAuthenticated } = useAuthGuard();
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isSuccess, setIsSuccess] = useState(false)

@@ -35,6 +35,8 @@ interface PasswordFormData {
 }
 
 export default function EditProfilePage() {
+  window.document.title = "Profil | EduReach"
+
   const { isAuthenticated } = useAuthGuard();
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isSuccess, setIsSuccess] = useState(false)

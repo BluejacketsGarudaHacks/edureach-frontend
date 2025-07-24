@@ -30,6 +30,8 @@ import type { Route } from "./+types/page";
 import { useAuthGuard } from "~/lib/auth-middleware";
 
 export default function HomePage({ loaderData }: Route.ComponentProps) {
+  window.document.title = "Home | EduReach";
+
   const { isAuthenticated, logout } = useAuthGuard();
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [profilePicture, setProfilePicture] = useState("");

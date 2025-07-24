@@ -158,6 +158,8 @@ const sortOptions = [
 ]
 
 export default function CommunityListPage() {
+  window.document.title = "Jelajahi Komunitas | EduReach"
+
   const { isAuthenticated } = useAuthGuard();
   const [searchQuery, setSearchQuery] = useState("")
   const [selectedLocation, setSelectedLocation] = useState("All Cities")

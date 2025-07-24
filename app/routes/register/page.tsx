@@ -6,6 +6,8 @@ import { useEffect } from "react";
 import { checkAuth } from "~/lib/auth-loader";
 
 export default function RegisterPage() {
+  window.document.title = "Daftar | EduReach";
+
   const nav = useNavigate();
 
   useEffect(() => {
