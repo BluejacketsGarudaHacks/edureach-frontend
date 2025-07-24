@@ -43,6 +43,7 @@ import {
   EyeOff,
 } from "lucide-react";
 import { useAuthGuard } from "~/lib/auth-middleware";
+import Loading from "~/components/ui/loading";
 
 export async function clientLoader() {
 
@@ -56,7 +57,7 @@ export async function clientLoader() {
 
 
 export function HydrateFallback() {
-  return <div>Loading...</div>;
+  return <Loading />;
 }
 
 export default function EditProfilePage({loaderData}:Route.ComponentProps) {
