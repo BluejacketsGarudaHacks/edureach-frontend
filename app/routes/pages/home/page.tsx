@@ -208,13 +208,15 @@ export default function HomePage({ loaderData }: Route.ComponentProps) {
                 <Badge variant="secondary">Jawa</Badge>
                 <Badge variant="secondary">Sunda</Badge>
               </div>
-              <Button
-                className="w-full bg-blue-600 hover:bg-blue-700"
-                onClick={handleSummarizeClick}
-              >
-                <FileText className="w-4 h-4 mr-2" />
-                Summarize Document
-              </Button>
+              <Link to={"/summarizer"}>
+                <Button
+                  className="w-full bg-blue-600 hover:bg-blue-700"
+                  onClick={handleSummarizeClick}
+                >
+                  <FileText className="w-4 h-4 mr-2" />
+                  Summarize Document
+                </Button>
+              </Link>
             </CardContent>
           </Card>
 
