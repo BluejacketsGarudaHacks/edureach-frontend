@@ -262,43 +262,16 @@ export default function CommunityDetailPage({ loaderData }: Route.ComponentProps
 
     if (!community) return null
 
-  const getRoleIcon = (role: string) => {
-    switch (role) {
-      case "creator":
-        return <Crown className="w-4 h-4 text-yellow-600" />
-      case "volunteer":
-        return <Shield className="w-4 h-4 text-blue-600" />
-      case "member":
-        return <User className="w-4 h-4 text-gray-600" />
-      default:
-        return <User className="w-4 h-4 text-gray-600" />
-    }
+  const getRoleIcon = (role: boolean) => {
+    return role? <Shield className="w-4 h-4 text-blue-600" />:<User className="w-4 h-4 text-gray-600" />
   }
 
-  const getRoleLabel = (role: string) => {
-    switch (role) {
-      case "creator":
-        return "Pembuat Komunitas"
-      case "volunteer":
-        return "Relawan"
-      case "member":
-        return "Anggota"
-      default:
-        return role
-    }
+  const getRoleLabel = (role: boolean) => {
+    return role?"Relawan":"Anggota"
   }
 
-  const getRoleColor = (role: string) => {
-    switch (role) {
-      case "creator":
-        return "bg-yellow-100 text-yellow-800"
-      case "volunteer":
-        return "bg-blue-100 text-blue-800"
-      case "member":
-        return "bg-gray-100 text-gray-800"
-      default:
-        return "bg-gray-100 text-gray-800"
-    }
+  const getRoleColor = (role: boolean) => {
+    return role?"bg-blue-100 text-blue-800":"bg-gray-100 text-gray-800"
   }
 
   const formatDate = (dateString: string) => {
@@ -421,7 +394,7 @@ export default function CommunityDetailPage({ loaderData }: Route.ComponentProps
           </TabsContent>
 
           {/* Members Tab */}
-          {/* <TabsContent value="members" className="space-y-6">
+          <TabsContent value="members" className="space-y-6">
             <Card className="shadow-lg border-0">
               <CardHeader>
                 <CardTitle>Anggota Komunitas ({community.members.length})</CardTitle>
@@ -437,35 +410,20 @@ export default function CommunityDetailPage({ loaderData }: Route.ComponentProps
                               src={`${import.meta.env.VITE_BACKEND_URL}${member.user.imagePath}` || "/placeholder.svg"}
                               alt={member.user.fullName}
                               className="w-12 h-12 rounded-full object-cover"
-                            />
+                            />  
                             
                           </div>
                           <div className="flex-1 min-w-0">
                             <div className="flex items-center space-x-2 mb-1">
-                              {getRoleIcon(member.role)}
-                              <h3 className="font-semibold text-sm truncate">{member.name}</h3>
+                              {getRoleIcon(member.user.isVolunteer)}
+                              <h3 className="font-semibold text-sm truncate border">{member.user.email}</h3>
                             </div>
-                            <Badge className={`${getRoleColor(member.role)} text-xs mb-2`}>
-                              {getRoleLabel(member.role)}
+                            <Badge className={`${getRoleColor(member.user.isVolunteer)} text-xs mb-2`}>
+                              {getRoleLabel(member.user.isVolunteer)}
                             </Badge>
-                            {member.specialties && (
-                              <div className="flex flex-wrap gap-1 mb-2">
-                                {member.specialties.slice(0, 2).map((specialty, index) => (
-                                  <Badge key={index} variant="outline" className="text-xs">
-                                    {specialty}
-                                  </Badge>
-                                ))}
-                                {member.specialties.length > 2 && (
-                                  <Badge variant="outline" className="text-xs">
-                                    +{member.specialties.length - 2}
-                                  </Badge>
-                                )}
-                              </div>
-                            )}
-                            {member.bio && <p className="text-xs text-gray-600 line-clamp-2">{member.bio}</p>}
+                            
                             <div className="flex justify-between items-center mt-2 text-xs text-gray-500">
-                              <span>Bergabung {member.joinDate}</span>
-                              <span>{member.contributionScore} poin</span>
+                              <span>Bergabung {formatDate(member.createdAt)}</span>
                             </div>
                           </div>
                         </div>
@@ -475,7 +433,7 @@ export default function CommunityDetailPage({ loaderData }: Route.ComponentProps
                 </div>
               </CardContent>
             </Card>
-          </TabsContent> */}
+          </TabsContent>
 
           {/* Schedules Tab */}
           {/* <TabsContent value="schedules" className="space-y-6">
