@@ -104,7 +104,7 @@ export function RegisterForm() {
                 render={({ field }) => (
                     <FormItem>
                         <FormControl>
-                            <Input placeholder="Masukkan email disini" id ="email" {...field} />
+                            <Input placeholder="Masukkan email.." id ="email" {...field} />
                         </FormControl>
                         <FormMessage />
                     </FormItem>
@@ -122,10 +122,10 @@ export function RegisterForm() {
                 render={({ field }) => (
                     <FormItem>
                         <FormControl>
-                            <div className="relative">
+                            <div className="flex justify-between">
                                 <Input
                                     id="dateOfBirth"
-                                    placeholder="Masukkan tanggal lahir"
+                                    placeholder="Masukkan tanggal lahir.."
                                     type="date"
                                     className="h-11 pr-10"
                                     {...field}
@@ -151,7 +151,7 @@ export function RegisterForm() {
                         <FormItem>
                             <FormControl>
                             <div className="relative">
-                                <Input placeholder="Masukkan password disini" {...field} type={showPassword?"":"password"}/>
+                                <Input placeholder="Masukkan password.." {...field} type={showPassword?"":"password"}/>
                                 <button
                                 type="button"
                                 onClick={() => setShowPassword(!showPassword)}
@@ -179,7 +179,7 @@ export function RegisterForm() {
                         <FormItem>
                             <FormControl>
                             <div className="relative">
-                                <Input placeholder="Masukkan password konfirmasi disini" {...field} type={showPassword?"":"password"}/>
+                                <Input placeholder="Masukkan konfirmasi password.." {...field} type={showPassword?"":"password"}/>
                                 <button
                                 type="button"
                                 onClick={() => setShowPassword(!showPassword)}

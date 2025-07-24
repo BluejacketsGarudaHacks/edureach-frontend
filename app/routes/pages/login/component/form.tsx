@@ -70,7 +70,7 @@ export function LoginForm() {
                   render={({ field }) => (
                     <FormItem>
                       <FormControl>
-                        <Input placeholder="masukkan email disini" {...field} />
+                        <Input placeholder="Masukkan email.." {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -88,7 +88,7 @@ export function LoginForm() {
                       <FormItem>
                         <FormControl>
                           <div className="relative">
-                            <Input placeholder="Masukkan password disini" {...field} type={showPassword?"":"password"}/>
+                            <Input placeholder="Masukkan password.." {...field} type={showPassword?"":"password"}/>
                             <button
                               type="button"
                               onClick={() => setShowPassword(!showPassword)}
