@@ -1,6 +1,6 @@
 import { Button } from "../../../components/ui/button"
 import { ArrowLeft } from "lucide-react"
-import { Form } from "./component/form"
+import { LoginForm } from "./component/form"
 
 export default function LoginPage() {
   return (
@@ -15,7 +15,7 @@ export default function LoginPage() {
       </Button>
 
       <div className="w-full max-w-md relative z-10">
-        <Form />
+        <LoginForm />
       </div>
 
       <div className="absolute top-20 left-20 w-32 h-32 bg-gradient-to-r from-blue-400 to-purple-400 rounded-full opacity-10 blur-xl"></div>
