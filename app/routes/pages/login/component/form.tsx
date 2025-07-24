@@ -29,14 +29,14 @@ export function LoginForm() {
   const handleSubmit = async  (data:loginInput) => {
       try {
         let response = await login({data})
-        toast("Login success. redirecting to homepage")
+        toast("Berhasil masuk")
         setTimeout(() => {
           navigate("/home")
         }, 2000);
       } catch (error) {
         if (axios.isAxiosError(error)){
           if (error.response){
-            toast("Login error. " + error.response.statusText)
+            toast("Gagal masuk. " + error.response.statusText)
           }
         }
       }
@@ -70,7 +70,7 @@ export function LoginForm() {
                   render={({ field }) => (
                     <FormItem>
                       <FormControl>
-                        <Input placeholder="Masukkan email.." {...field} />
+                        <Input placeholder="john@edureach.com" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
