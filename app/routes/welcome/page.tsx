@@ -1,7 +1,7 @@
 import { Button } from "../../components/ui/button"
 import { Card, CardContent } from "../../components/ui/card"
 import { Badge } from "../../components/ui/badge"
-import { BookOpen, Users, Zap, ArrowRight, Play, Star, CheckCircle } from "lucide-react"
+import { BookOpen, Users, Zap, ArrowRight, Play, Star } from "lucide-react"
 import { Link } from "react-router"
 import Logo from "~/components/logo"
 
@@ -17,16 +17,10 @@ export default function WelcomePage() {
             </span>
           </div>
           <div className="hidden md:flex items-center space-x-6">
-            <a href="#features" className="text-gray-600 hover:text-gray-900 transition-colors">
-              Features
-            </a>
-            <a href="#about" className="text-gray-600 hover:text-gray-900 transition-colors">
-              About
-            </a>
+            <a href="#features" className="text-gray-600 hover:text-gray-900 transition-colors">Fitur</a>
+            <a href="#about" className="text-gray-600 hover:text-gray-900 transition-colors">Tentang Kami</a>
             <Link to={"/auth/login"}>
-                <Button variant="outline" size="sm">
-                Sign In
-                </Button>
+                <Button variant="outline" size="sm">Masuk</Button>
             </Link>
           </div>
         </nav>
@@ -35,13 +29,13 @@ export default function WelcomePage() {
       <section className="container mx-auto px-4 py-20 text-center">
         <Badge variant="secondary" className="mb-6 bg-blue-100 text-blue-700 hover:bg-blue-100">
           <Zap className="w-3 h-3 mr-1" />
-          Now Available
+          Telah Hadir
         </Badge>
 
         <h1 className="text-5xl md:text-7xl font-bold mb-6 bg-gradient-to-r from-blue-600 via-purple-600 to-blue-800 bg-clip-text text-transparent leading-tight">
-          Reach Every
+          Mewujudkan Potensi
           <br />
-          Student's Potential
+          Setiap Siswa
         </h1>
 
         <p className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto leading-relaxed">
@@ -55,7 +49,7 @@ export default function WelcomePage() {
                 size="lg"
                 className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-8 py-3"
             >
-                Get Started
+                Mulai Sekarang
                 <ArrowRight className="w-4 h-4 ml-2" />
             </Button>
           </Link>
@@ -97,24 +91,19 @@ export default function WelcomePage() {
               <div className="w-16 h-16 bg-gradient-to-r from-blue-500 to-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-6">
                 <Zap className="w-8 h-8 text-white" />
               </div>
-              <h3 className="text-xl font-semibold mb-4 text-gray-900">AI Summarizer Multibahasa</h3>
+              <h3 className="text-xl font-semibold mb-4 text-gray-900">Summarizer AI Multibahasa</h3>
               <p className="text-gray-600 leading-relaxed mb-4">
-                Rangkum materi pembelajaran dalam bahasa Indonesia, Inggris, atau bahasa daerah dengan teknologi AI
-                canggih.
+                Rangkum materi pembelajaran dalam bahasa Indonesia, Inggris, atau bahasa daerah dengan teknologi AI canggih.
               </p>
               <div className="flex flex-wrap gap-2 justify-center">
-                <Badge variant="secondary" className="text-xs">
-                  Bahasa Indonesia
-                </Badge>
-                <Badge variant="secondary" className="text-xs">
-                  English
-                </Badge>
-                <Badge variant="secondary" className="text-xs">
-                  Bahasa Jawa
-                </Badge>
-                <Badge variant="secondary" className="text-xs">
-                  Bahasa Sunda
-                </Badge>
+                <Badge variant="secondary" className="text-xs">Bahasa Indonesia</Badge>
+                <Badge variant="secondary" className="text-xs">Bali</Badge>
+                <Badge variant="secondary" className="text-xs">Jawa</Badge>
+                <Badge variant="secondary" className="text-xs">Sunda</Badge>
+                <Badge variant="secondary" className="text-xs">Batak Toba</Badge>
+                <Badge variant="secondary" className="text-xs">Batak Karo</Badge>
+                <Badge variant="secondary" className="text-xs">Batak Simalungun</Badge>
+                <Badge variant="secondary" className="text-xs">Minang</Badge>
               </div>
             </CardContent>
           </Card>
