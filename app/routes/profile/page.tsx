@@ -22,17 +22,13 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog"
-import { Alert, AlertDescription } from "@/components/ui/alert"
-import { ArrowLeft, Upload, User, Mail, Calendar, Lock, Camera, CheckCircle, Eye, EyeOff } from "lucide-react"
+} from "@/components/ui/dialog";
 import axios from "axios"
 import { toast, Toaster } from "sonner"
 import { useNavigate } from "react-router"
 import type { Route } from "./+types/page"
 import { getCurrentUser } from "../home/api"
-import { useAuthGuard } from "~/lib/auth-middleware"
 import { changePassword, updateUser, type changePasswordInput, type updateUserInput } from "./api"
-} from "@/components/ui/dialog";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import {
   ArrowLeft,
