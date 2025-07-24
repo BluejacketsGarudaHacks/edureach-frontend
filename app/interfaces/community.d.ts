@@ -16,4 +16,5 @@ export interface Community {
 interface Member {
     userId: string;
     user: User;
+    createdAt: string;
 }
