@@ -26,9 +26,10 @@ import {
 import Logo from "~/components/logo";
 import { Link } from "react-router";
 import { useEffect, useState } from "react";
-import { getCurrentUser, getUserCommunities } from "./api";
+import { getCurrentUser, getNotifications, updateNotification, getUserCommunities } from "./api";
 import { useAuthGuard } from "~/lib/auth-middleware";
 import { useUser } from "~/hooks/useUser";
+import { toast } from "sonner";
 import type { Community } from "~/interfaces/community";
 
 export default function HomePage() {
@@ -84,6 +85,22 @@ export default function HomePage() {
             .join("")
         : "XX"
     );
+  }, [user]);
+
+  
+  useEffect(() => {
+    if (user == null) return;
+    const token = localStorage.getItem("token");
+    if (token == null) return;
+
+    getNotifications(token).then((result) => {
+      for (const notif of result) {
+        if (notif.isShown == false) {
+          toast(notif.message);
+          updateNotification(notif, token);
+        }
+      }
+    });
   }, [user]);
 
   // Separate effect for fetching communities when user is available
