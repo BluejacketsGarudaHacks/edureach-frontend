@@ -27,8 +27,13 @@ export type changePasswordInput = z.infer<typeof changePasswordInputSchema>
 export const updateUser = ({data, token}:{data:updateUserInput, token: string}) => {
     const formData = new FormData()
 
-    formData.append("FirstName", data.fullName.split(' ')[0])
-    formData.append("LastName", data.fullName.split(' ').length < 2 ? data.fullName.split(' ')[0]: data.fullName.split(' ')[1])
+    if (data.fullName.split(' ').length >= 2){
+        formData.append("FirstName", data.fullName.split(' ')[0])
+        formData.append("LastName", data.fullName.split(' ').length < 2 ? data.fullName.split(' ')[0]: data.fullName.split(' ')[1])
+    }else{
+        formData.append("FirstName", data.fullName)
+        formData.append("LastName", '')
+    }
     formData.append("Dob", data.dateOfBirth)
     formData.append("Email", data.email)
     formData.append("Image", data.image)
