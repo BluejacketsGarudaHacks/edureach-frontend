@@ -18,13 +18,13 @@ export const updateUserInputSchema = z.object({
   email: z.string().min(1, "Email tidak boleh kosong.").refine(
       e => e.includes("@") && e.endsWith(".com")
       , "Email harus dalam format [nama]@[domain].com"),
-  image: z.instanceof(File).optional()
 })
+
 
 export type updateUserInput = z.infer<typeof updateUserInputSchema>
 export type changePasswordInput = z.infer<typeof changePasswordInputSchema>
 
-export const updateUser = ({data, token}:{data:updateUserInput, token: string}) => {
+export const updateUser = ({data, token, image}:{data:updateUserInput, token: string, image?:File}) => {
     const formData = new FormData()
 
     if (data.fullName.split(' ').length >= 2){
@@ -37,8 +37,8 @@ export const updateUser = ({data, token}:{data:updateUserInput, token: string}) 
     formData.append("Dob", data.dateOfBirth)
     formData.append("Email", data.email)
 
-    if (data.image){
-        formData.append("Image", data.image)
+    if (image){
+        formData.append("Image", image)
     }
 
     return api.put("user", formData, {

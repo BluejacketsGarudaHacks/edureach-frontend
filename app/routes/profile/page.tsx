@@ -127,11 +127,9 @@ export default function EditProfilePage({loaderData}:Route.ComponentProps) {
       return
     }
     try {
-      if (currentFile){
-        data.image = currentFile
-        await updateUser({data, token})
-        toast("Profil berhasil diubah")
-      }
+      await updateUser({data, token, image: currentFile})
+      toast("Profil berhasil diubah")
+      
     } catch (error) {
       if (axios.isAxiosError(error)){
         toast("Profil gagal diubah")
