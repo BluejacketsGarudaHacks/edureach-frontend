@@ -150,6 +150,7 @@ export function LoginForm() {
             </Button>
           </form>
         </Form>
+        
         <div className="mt-6 text-center">
           <p className="text-gray-600">
             Belum punya akun?{" "}
