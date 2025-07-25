@@ -26,9 +26,10 @@ import {
 import Logo from "~/components/logo";
 import { Link } from "react-router";
 import { useEffect, useState } from "react";
-import { getCurrentUser, getUserCommunities } from "./api";
+import { getCurrentUser, getNotifications, updateNotification, getUserCommunities } from "./api";
 import { useAuthGuard } from "~/lib/auth-middleware";
 import { useUser } from "~/hooks/useUser";
+import { toast } from "sonner";
 import type { Community } from "~/interfaces/community";
 
 export default function HomePage() {
@@ -86,6 +87,22 @@ export default function HomePage() {
     );
   }, [user]);
 
+  
+  useEffect(() => {
+    if (user == null) return;
+    const token = localStorage.getItem("token");
+    if (token == null) return;
+
+    getNotifications(token).then((result) => {
+      for (const notif of result) {
+        if (notif.isShown == false) {
+          toast(notif.message);
+          updateNotification(notif, token);
+        }
+      }
+    });
+  }, [user]);
+
   // Separate effect for fetching communities when user is available
   useEffect(() => {
     if (!user?.id) {
@@ -102,6 +119,11 @@ export default function HomePage() {
     setIsLoadingCommunities(true);
     getUserCommunities(token, user.id)
       .then((communities) => {
+        communities.forEach((community) => {
+          community.volunteers = community.members.filter(
+            (member) => member.user.isVolunteer
+          );
+        });
         if (communities) {
           setJoinedCommunities(communities);
         }
@@ -113,11 +135,6 @@ export default function HomePage() {
       });
   }, [user?.id]); // Only depend on user ID
 
-  const handleViewCommunityDetail = (communityId: string) => {
-    // Navigate to community detail page
-    console.log("Navigate to community detail:", communityId);
-  };
-
   const CommunityCard = ({ community }: { community: Community }) => (
     <div className="p-4 border border-gray-200 rounded-lg hover:shadow-md transition-shadow cursor-pointer">
       <div className="flex items-start space-x-3 mb-3">
@@ -126,7 +143,7 @@ export default function HomePage() {
             src={
               community.imagePath
                 ? `${import.meta.env.VITE_BACKEND_URL}${community.imagePath}`
-                : "/placeholder.svg?height=48&width=48"
+                : ""
             }
             alt={community.name}
           />
@@ -169,15 +186,16 @@ export default function HomePage() {
               </div>
             </div>
 
-            <Button
-              size="sm"
-              variant="outline"
-              onClick={() => handleViewCommunityDetail(community.id)}
-              className="text-xs"
-            >
-              <Eye className="w-3 h-3 mr-1" />
-              Lihat Detail
-            </Button>
+            <Link to={"/community/" + community.id}>
+              <Button
+                size="sm"
+                variant="outline"
+                className="text-xs"
+              >
+                <Eye className="w-3 h-3 mr-1" />
+                Lihat Detail
+              </Button>
+            </Link>
           </div>
         </div>
       </div>
@@ -207,7 +225,7 @@ export default function HomePage() {
               </Button>
               <Link to="/profile">
                 <Avatar className="w-8 h-8">
-                  <AvatarImage src={profilePicture || "/placeholder.svg"} />
+                  <AvatarImage src={profilePicture || ""} />
                   <AvatarFallback>{avatarFallback}</AvatarFallback>
                 </Avatar>
               </Link>

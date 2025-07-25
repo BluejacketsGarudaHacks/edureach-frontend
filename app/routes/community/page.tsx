@@ -20,7 +20,6 @@ import type { Route } from "./+types/page";
 import ScheduleManager from "./schedule-manager";
 import { useAuthGuard } from "~/lib/auth-middleware";
 
-
 export const clientLoader = async ({ params }: Route.ClientLoaderArgs) => {
   let token = localStorage.getItem("token");
   if (!token) return null;
@@ -29,7 +28,6 @@ export const clientLoader = async ({ params }: Route.ClientLoaderArgs) => {
     let response = await getCommunity({ id: params.id, token });
     return response;
   } catch (error) {
-    console.log(error);
     return null;
   }
 };
@@ -86,9 +84,9 @@ export default function CommunityDetailPage({
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4">
               <Button variant="ghost" size="sm" asChild>
-                <a href="/community">
+                <a href="/home">
                   <ArrowLeft className="w-4 h-4 mr-2" />
-                  Kembali ke Komunitas
+                  Kembali ke dashboard
                 </a>
               </Button>
               <div className="flex items-center space-x-2">
@@ -105,40 +103,31 @@ export default function CommunityDetailPage({
       </header>
 
       <div className="container mx-auto px-4 py-8">
-        {/* Community Header */}
-        <Card className="mb-8 shadow-lg border-0 overflow-hidden">
-          <div className="relative">
-            <img
-              src={
-                `${import.meta.env.VITE_BACKEND_URL}${community.imagePath}` ||
-                "/placeholder.svg"
-              }
-              alt={community.name}
-              className="w-full h-64 object-cover"
-            />
-            <div className="absolute bottom-6 left-6 text-white">
-              <h1 className="text-4xl font-bold mb-2">{community.name}</h1>
-              <div className="flex items-center space-x-4 text-sm">
-                <div className="flex items-center">
-                  <MapPin className="w-4 h-4 mr-1" />
-                  <span>{community.location.city} </span>
-                </div>
-                <div className="flex items-center">
-                  <Users className="w-4 h-4 mr-1" />
-                  <span>{community.members.length} anggota</span>
-                </div>
+        <Card className="mb-8 shadow-lg border-0 overflow-hidden relative">
+          <img
+            src={
+              `${import.meta.env.VITE_BACKEND_URL}${community.imagePath}` ||
+              "/placeholder.svg"
+            }
+            alt={community.name}
+            className="w-full h-64 object-cover"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/40 to-transparent pointer-events-none" />
+          <div className="absolute bottom-6 left-6 text-white z-10">
+            <h1 className="text-4xl font-bold mb-2 drop-shadow-lg">{community.name}</h1>
+            <div className="flex items-center space-x-4 text-sm">
+              <div className="flex items-center">
+                <MapPin className="w-4 h-4 mr-1" />
+                <span className="drop-shadow">{community.location.city} </span>
               </div>
-            </div>
-            <div className="absolute top-6 right-6">
-              <Button className="bg-blue-600 hover:bg-blue-700 text-white">
-                <UserPlus className="w-4 h-4 mr-2" />
-                Gabung Komunitas
-              </Button>
+              <div className="flex items-center">
+                <Users className="w-4 h-4 mr-1" />
+                <span className="drop-shadow">{community.members.length} anggota</span>
+              </div>
             </div>
           </div>
         </Card>
 
-        {/* Community Navigation */}
         <Tabs
           value={activeTab}
           onValueChange={setActiveTab}
