@@ -149,7 +149,6 @@ export default function ScheduleManager({ communityId }: I) {
           <h3 className="text-lg font-semibold">
             Jadwal Komunitas ({schedules.length})
           </h3>
-
           {schedules.length === 0 ? (
             <Card>
               <CardContent className="py-8 text-center text-muted-foreground">
