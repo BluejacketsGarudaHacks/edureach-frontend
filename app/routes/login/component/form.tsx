@@ -142,14 +142,6 @@ export function LoginForm() {
                 )}
               />
             </div>
-
-            <div className="flex items-center justify-between text-sm">
-              <label className="flex items-center space-x-2 cursor-pointer">
-                <input type="checkbox" className="rounded border-gray-300" />
-                <span className="text-gray-600">Ingat saya</span>
-              </label>
-            </div>
-
             <Button
               type="submit"
               className="w-full h-11 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-medium"

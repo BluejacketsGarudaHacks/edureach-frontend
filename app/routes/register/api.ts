@@ -21,6 +21,6 @@ export const registerInputSchema = z.object({
 export type RegisterInput = z.infer<typeof registerInputSchema>;
 
 export const register = async ({data}:{data: RegisterInput}):Promise<string> => {
-    console.log(data.isVolunteer)
-    return api.post('user/register', {...data})
+    
+    return api.post('user/register', {...data, dob: data.dateOfBirth})
 }
