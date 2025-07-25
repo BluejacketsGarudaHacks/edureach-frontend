@@ -38,7 +38,6 @@ export const clientLoader = async () => {
     })
     return response.data
   } catch (error) {
-    console.log(error)
     return indonesianLocations
   }
 }

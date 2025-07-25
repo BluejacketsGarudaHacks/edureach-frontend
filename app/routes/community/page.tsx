@@ -28,7 +28,6 @@ export const clientLoader = async ({ params }: Route.ClientLoaderArgs) => {
     let response = await getCommunity({ id: params.id, token });
     return response;
   } catch (error) {
-    console.log(error);
     return null;
   }
 };
