@@ -10,23 +10,15 @@ import {
   ArrowLeft,
   MapPin,
   Users,
-  Star,
-  Calendar,
-  Clock,
-  MessageCircle,
   UserPlus,
-  Crown,
   Shield,
   User,
-  Video,
-  FileText,
 } from "lucide-react";
 import Loading from "~/components/ui/loading";
-import { api } from "~/util/apiClient";
 import { getCommunity } from "./api";
 import type { Route } from "./+types/page";
-import { Link, NavLink } from "react-router";
 import ScheduleManager from "./schedule-manager";
+import { useAuthGuard } from "~/lib/auth-middleware";
 
 export const clientLoader = async ({ params }: Route.ClientLoaderArgs) => {
   let token = localStorage.getItem("token");
@@ -50,6 +42,12 @@ export default function CommunityDetailPage({
 }: Route.ComponentProps) {
   const community = loaderData;
   const [activeTab, setActiveTab] = useState("overview");
+  const { isAuthenticated } = useAuthGuard();
+  
+
+  if (!isAuthenticated()) {
+    return null;
+  }
 
   if (!community) return null;
 
