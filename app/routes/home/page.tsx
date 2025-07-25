@@ -118,11 +118,6 @@ export default function HomePage() {
       });
   }, [user?.id]); // Only depend on user ID
 
-  const handleViewCommunityDetail = (communityId: string) => {
-    // Navigate to community detail page
-    console.log("Navigate to community detail:", communityId);
-  };
-
   const CommunityCard = ({ community }: { community: Community }) => (
     <div className="p-4 border border-gray-200 rounded-lg hover:shadow-md transition-shadow cursor-pointer">
       <div className="flex items-start space-x-3 mb-3">
@@ -178,7 +173,6 @@ export default function HomePage() {
               <Button
                 size="sm"
                 variant="outline"
-                onClick={() => handleViewCommunityDetail(community.id)}
                 className="text-xs"
               >
                 <Eye className="w-3 h-3 mr-1" />

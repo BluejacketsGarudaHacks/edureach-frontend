@@ -12,7 +12,6 @@ export default async function getSummarizedPDF(
   try {
     const result = api.post("summarize/upload", formData);
 
-    console.log(result);
     return result;
   } catch (error: any) {
     console.error("Error uploading PDF:", error);

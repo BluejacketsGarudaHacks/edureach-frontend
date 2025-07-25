@@ -105,8 +105,6 @@ export default function CommunityListPage() {
     
     const token = localStorage.getItem("token");
     if (token && user) {
-      console.log("Fetching data with user:", user);
-      
       Promise.all([
         getLocations(token),
         getCommunities(token)
