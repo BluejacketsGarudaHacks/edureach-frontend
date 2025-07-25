@@ -14,7 +14,7 @@ export const registerInputSchema = z.object({
   }),
   isVolunteer: z.boolean()
 }).refine((data) => data.password === data.confirmPassword, {
-  message: "Password tidak sama dengan konfir
+  message: "Password tidak sama dengan konfirmasi password",
   path: ["confirmPassword"],
 });
 
