@@ -14,7 +14,10 @@ export default [
     route("/home", "routes/home/page.tsx"),
     route("/create-community", "routes/create-community/page.tsx"),
     route("/profile", "routes/profile/page.tsx"),
-    route("/community", "routes/community-list/page.tsx"),
+    ...prefix("/community", [
+      index("routes/community-list/page.tsx"),
+      route(":id", "routes/community/page.tsx")
+    ]),
     route("/summarizer", "routes/summarizer/page.tsx"),
     route("/notification", "routes/notification/page.tsx")
 ] satisfies RouteConfig;

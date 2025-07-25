@@ -14,12 +14,13 @@ import { Alert, AlertDescription } from "@/components/ui/alert"
 import { ArrowLeft, Upload, Users, MapPin, FileText, ImageIcon, CheckCircle } from "lucide-react"
 import { useNavigate } from "react-router"
 import { createCommunity, type createCommunityInput } from "./api"
-import { toast } from "sonner"
+import { toast, Toaster } from "sonner"
 import axios from "axios"
 import { useAuthGuard } from "~/lib/auth-middleware"
 import { useEditor } from "@tiptap/react"
 import type { Route } from "./+types/page"
 import type { Location } from "~/interfaces/location"
+import Loading from "~/components/ui/loading"
 
 
 export const clientLoader = async () => {
@@ -37,13 +38,12 @@ export const clientLoader = async () => {
     })
     return response.data
   } catch (error) {
-    console.log(error)
     return indonesianLocations
   }
 }
 
 export function HydrateFallback() {
-  return <div>Loading...</div>;
+  return <Loading />;
 }
 
 export default function CreateCommunityPage({loaderData}:Route.ComponentProps) {
@@ -95,7 +95,7 @@ export default function CreateCommunityPage({loaderData}:Route.ComponentProps) {
     
     const token = window.localStorage.getItem("token")
     if (!token){
-      toast("Anda tidak diperbolehkan untuk memperbaharui profil anda")
+      toast("Anda tidak diperbolehkan untuk mendaftar komunitas")
       return
     }
     try {

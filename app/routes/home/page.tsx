@@ -16,91 +16,194 @@ import {
   FileText,
   Plus,
   UserPlus,
-  BookOpen,
   Bell,
   Settings,
   LogOut,
+  MapPin,
+  UserCheck,
+  Eye,
 } from "lucide-react";
 import Logo from "~/components/logo";
 import { Link } from "react-router";
 import { useEffect, useState } from "react";
-import { getCurrentUser } from "./api";
-import type { User } from "~/interfaces/user";
-import type { Route } from "./+types/page";
+import { getCurrentUser, getNotifications, updateNotification, getUserCommunities } from "./api";
 import { useAuthGuard } from "~/lib/auth-middleware";
+import { useUser } from "~/hooks/useUser";
+import { toast } from "sonner";
+import type { Community } from "~/interfaces/community";
 
-export default function HomePage({ loaderData }: Route.ComponentProps) {
+export default function HomePage() {
+  const { isAuthenticated, logout: authLogout } = useAuthGuard();
+  const { user, setUser, clearUser } = useUser();
+  const [profilePicture, setProfilePicture] = useState("");
+  const [avatarFallback, setAvatarFallback] = useState("XX");
+  const [joinedCommunities, setJoinedCommunities] = useState<Community[]>([]);
+  const [isLoadingCommunities, setIsLoadingCommunities] = useState(true);
+
   useEffect(() => {
     window.document.title = "Home | EduReach";
   }, []);
 
-  const { isAuthenticated, logout } = useAuthGuard();
-  const [currentUser, setCurrentUser] = useState<User | null>(null);
-  const [profilePicture, setProfilePicture] = useState("");
-  const [avatarFallback, setAvatarFallback] = useState("XX");
-
-  // Don't render if not authenticated
-  if (!isAuthenticated()) {
-    return null;
-  }
+  const logout = () => {
+    clearUser();
+    authLogout();
+  };
 
   useEffect(() => {
+    // Only fetch user data once when component mounts if user is not already loaded
+    if (user) return; // User already exists, no need to fetch
+
+    const authStatus = isAuthenticated();
+    if (!authStatus) return;
+
     const token = localStorage.getItem("token");
-    if (token) {
-      getCurrentUser(token).then((user) => {
-        if (user) {
-          console.log(user);
-          setCurrentUser(user);
-          setProfilePicture(
-            user.imagePath !== ""
-              ? `${import.meta.env.VITE_BACKEND_URL}${user.imagePath}`
-              : ""
-          );
-          setAvatarFallback(
-            user.fullName
-              ? user.fullName
-                  .split(" ")
-                  .map((n) => n[0])
-                  .join("")
-              : "XX"
-          );
-        } else {
+    if (!token) return;
+
+    getCurrentUser(token)
+      .then((fetchedUser) => {
+        if (fetchedUser) {
+          setUser(fetchedUser);
         }
+      })
+      .catch((error) => {
+        console.error("Error fetching user:", error);
       });
+  }, []); // Empty dependency array - only run once on mount
+
+  // Separate effect for updating profile picture and avatar fallback when user changes
+  useEffect(() => {
+    setProfilePicture(
+      user?.imagePath !== ""
+        ? `${import.meta.env.VITE_BACKEND_URL}${user?.imagePath}`
+        : ""
+    );
+    setAvatarFallback(
+      user?.fullName
+        ? user.fullName
+            .split(" ")
+            .map((n) => n[0])
+            .join("")
+        : "XX"
+    );
+  }, [user]);
+
+  
+  useEffect(() => {
+    if (user == null) return;
+    const token = localStorage.getItem("token");
+    if (token == null) return;
+
+    getNotifications(token).then((result) => {
+      for (const notif of result) {
+        if (notif.isShown == false) {
+          toast(notif.message);
+          updateNotification(notif, token);
+        }
+      }
+    });
+  }, [user]);
+
+  // Separate effect for fetching communities when user is available
+  useEffect(() => {
+    if (!user?.id) {
+      setIsLoadingCommunities(false);
+      return;
     }
-  }, []);
 
-  const handleSummarizeClick = () => {
-    // Navigate to summarize page
-    console.log("Navigate to summarize page");
-  };
+    const token = localStorage.getItem("token");
+    if (!token) {
+      setIsLoadingCommunities(false);
+      return;
+    }
 
-  const handleJoinCommunity = () => {
-    // Handle join community action
-    console.log("Join community clicked");
-  };
+    setIsLoadingCommunities(true);
+    getUserCommunities(token, user.id)
+      .then((communities) => {
+        communities.forEach((community) => {
+          community.volunteers = community.members.filter(
+            (member) => member.user.isVolunteer
+          );
+        });
+        if (communities) {
+          setJoinedCommunities(communities);
+        }
+        setIsLoadingCommunities(false);
+      })
+      .catch((error) => {
+        console.error("Error fetching communities:", error);
+        setIsLoadingCommunities(false);
+      });
+  }, [user?.id]); // Only depend on user ID
 
-  const handleCreateCommunity = () => {
-    // Handle create community action
-    console.log("Create community clicked");
-  };
+  const CommunityCard = ({ community }: { community: Community }) => (
+    <div className="p-4 border border-gray-200 rounded-lg hover:shadow-md transition-shadow cursor-pointer">
+      <div className="flex items-start space-x-3 mb-3">
+        <Avatar className="w-12 h-12 flex-shrink-0">
+          <AvatarImage
+            src={
+              community.imagePath
+                ? `${import.meta.env.VITE_BACKEND_URL}${community.imagePath}`
+                : ""
+            }
+            alt={community.name}
+          />
+          <AvatarFallback className="bg-gradient-to-r from-blue-500 to-purple-500 text-white">
+            {community.name
+              .split(" ")
+              .map((n) => n[0])
+              .join("")
+              .substring(0, 2)}
+          </AvatarFallback>
+        </Avatar>
+        <div className="flex-1 min-w-0">
+          <div className="flex items-start justify-between mb-2">
+            <div className="flex-1">
+              <h3 className="font-semibold text-gray-900 line-clamp-1">
+                {community.name}
+              </h3>
+              <div className="flex items-center text-sm text-gray-500 mt-1">
+                <MapPin className="w-3 h-3 mr-1 flex-shrink-0" />
+                <span className="truncate">
+                  {community.location.city}, {community.location.province}
+                </span>
+              </div>
+            </div>
+          </div>
 
-  // useEffect(() => {
-  //   getCurrentUser()
-  //     .then(user => {
-  //       console.log(user);
-  //       if (user) {
-  //         setProfilePicture(`${import.meta.env.VITE_BACKEND_URL}${user.imagePath}` || "");
-  //         setAvatarFallback(user.fullName ? user.fullName.split(" ").map(n => n[0]).join("") : "XX");
-  //       } else {
-  //         // TODO: Handle case where user is not logged in
-  //       }
-  //     })
-  // }, [])
+          <p className="text-sm text-gray-600 line-clamp-2 mb-3">
+            {community.description}
+          </p>
+
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-4 text-sm text-gray-600">
+              <div className="flex items-center">
+                <Users className="w-4 h-4 mr-1" />
+                <span>{community.members.length}</span>
+              </div>
+              <div className="flex items-center">
+                <UserCheck className="w-4 h-4 mr-1" />
+                <span>{community.volunteers.length}</span>
+              </div>
+            </div>
+
+            <Link to={"/community/" + community.id}>
+              <Button
+                size="sm"
+                variant="outline"
+                className="text-xs"
+              >
+                <Eye className="w-3 h-3 mr-1" />
+                Lihat Detail
+              </Button>
+            </Link>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header */}
       <header className="bg-white border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
@@ -124,7 +227,7 @@ export default function HomePage({ loaderData }: Route.ComponentProps) {
               </Button>
               <Link to="/profile">
                 <Avatar className="w-8 h-8">
-                  <AvatarImage src={profilePicture} />
+                  <AvatarImage src={profilePicture || ""} />
                   <AvatarFallback>{avatarFallback}</AvatarFallback>
                 </Avatar>
               </Link>
@@ -136,27 +239,24 @@ export default function HomePage({ loaderData }: Route.ComponentProps) {
         </div>
       </header>
 
-      {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Welcome Section */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900 mb-2">
-            Welcome back, {currentUser?.fullName}! 👋
+            Selamat datang, {user?.fullName}! 👋
           </h1>
           <p className="text-gray-600">
-            Ready to continue your educational journey? Here's what you can do
-            today.
+            Siap melanjutkan perjalanan Anda? Berikut yang bisa Anda lakukan
+            hari ini.
           </p>
         </div>
 
-        {/* Quick Stats */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
           <Card>
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm font-medium text-gray-600">
-                    Documents Summarized
+                    Dokumen yang Diringkas
                   </p>
                   <p className="text-2xl font-bold text-gray-900">12</p>
                 </div>
@@ -172,9 +272,11 @@ export default function HomePage({ loaderData }: Route.ComponentProps) {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm font-medium text-gray-600">
-                    Communities Joined
+                    Komunitas yang Diikuti
                   </p>
-                  <p className="text-2xl font-bold text-gray-900">3</p>
+                  <p className="text-2xl font-bold text-gray-900">
+                    {joinedCommunities.length}
+                  </p>
                 </div>
                 <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
                   <Users className="w-6 h-6 text-purple-600" />
@@ -182,27 +284,9 @@ export default function HomePage({ loaderData }: Route.ComponentProps) {
               </div>
             </CardContent>
           </Card>
-
-          {/* <Card>
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-gray-600">
-                    Learning Hours
-                  </p>
-                  <p className="text-2xl font-bold text-gray-900">24</p>
-                </div>
-                <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
-                  <BookOpen className="w-6 h-6 text-green-600" />
-                </div>
-              </div>
-            </CardContent>
-          </Card> */}
         </div>
 
-        {/* Main Features */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
-          {/* Multilingual AI Summarizer */}
           <Card className="hover:shadow-lg transition-shadow duration-200">
             <CardHeader className="text-center pb-4">
               <div className="w-16 h-16 bg-gradient-to-r from-blue-500 to-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
@@ -228,18 +312,14 @@ export default function HomePage({ loaderData }: Route.ComponentProps) {
                 <Badge variant="secondary">Minang</Badge>
               </div>
               <Link to={"/summarizer"}>
-                <Button
-                  className="w-full bg-blue-600 hover:bg-blue-700"
-                  onClick={handleSummarizeClick}
-                >
+                <Button className="w-full bg-blue-600 hover:bg-blue-700">
                   <FileText className="w-4 h-4 mr-2" />
-                  Summarize Document
+                  Ringkas Dokumen
                 </Button>
               </Link>
             </CardContent>
           </Card>
 
-          {/* Volunteer Teacher Community */}
           <Card className="hover:shadow-lg transition-shadow duration-200">
             <CardHeader className="text-center pb-4">
               <div className="w-16 h-16 bg-gradient-to-r from-purple-500 to-purple-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
@@ -255,150 +335,80 @@ export default function HomePage({ loaderData }: Route.ComponentProps) {
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="flex flex-wrap gap-2 justify-center">
-                <Badge variant="secondary">Free Teaching</Badge>
-                <Badge variant="secondary">Active Community</Badge>
-                <Badge variant="secondary">Certification</Badge>
+                <Badge variant="secondary">Pengajaran Gratis</Badge>
+                <Badge variant="secondary">Komunitas Aktif</Badge>
+                <Badge variant="secondary">Sertifikasi</Badge>
+                <Badge variant="secondary">Perluas Koneksi</Badge>
               </div>
-              <div className="space-y-2">
-                <Button
-                  className="w-full bg-purple-600 hover:bg-purple-700"
-                  onClick={handleJoinCommunity}
-                >
-                  <UserPlus className="w-4 h-4 mr-2" />
-                  Join Community
-                </Button>
-                <Button
-                  variant="outline"
-                  className="w-full bg-transparent"
-                  onClick={handleCreateCommunity}
-                >
-                  <Link
-                    to="/create-community"
-                    className="flex items-center content-center"
-                  >
+              <div className="flex flex-col gap-2">
+                <Link to={"/community"}>
+                  <Button className="w-full bg-purple-600 hover:bg-purple-700">
+                    <UserPlus className="w-4 h-4 mr-2" />
+                    Jelajahi Komunitas
+                  </Button>
+                </Link>
+                <Link to="/create-community">
+                  <Button variant="outline" className="w-full bg-transparent">
                     <Plus className="w-4 h-4 mr-2" />
-                    Create Community
-                  </Link>
-                </Button>
+                    Buat Komunitas Baru
+                  </Button>
+                </Link>
               </div>
             </CardContent>
           </Card>
-
-          {/* Recent Activity */}
-          {/* <Card>
-            <CardHeader>
-              <CardTitle className="text-xl font-bold">
-                Recent Activity
-              </CardTitle>
-              <CardDescription>
-                Your latest interactions and progress
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="space-y-3">
-                <div className="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg">
-                  <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
-                    <FileText className="w-4 h-4 text-blue-600" />
-                  </div>
-                  <div className="flex-1">
-                    <p className="text-sm font-medium">
-                      Summarized "Math Basics"
-                    </p>
-                    <p className="text-xs text-gray-500">2 hours ago</p>
-                  </div>
-                </div>
-
-                <div className="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg">
-                  <div className="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center">
-                    <Users className="w-4 h-4 text-purple-600" />
-                  </div>
-                  <div className="flex-1">
-                    <p className="text-sm font-medium">
-                      Joined "Jakarta Teachers"
-                    </p>
-                    <p className="text-xs text-gray-500">1 day ago</p>
-                  </div>
-                </div>
-
-                <div className="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg">
-                  <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
-                    <BookOpen className="w-4 h-4 text-green-600" />
-                  </div>
-                  <div className="flex-1">
-                    <p className="text-sm font-medium">Completed lesson</p>
-                    <p className="text-xs text-gray-500">3 days ago</p>
-                  </div>
-                </div>
-              </div>
-            </CardContent>
-          </Card> */}
         </div>
 
-        {/* My Communities */}
         <Card>
           <CardHeader>
-            <CardTitle className="text-xl font-bold">My Communities</CardTitle>
-            <CardDescription>
-              Communities you've joined or created
-            </CardDescription>
+            <div className="flex items-center justify-between">
+              <div>
+                <CardTitle className="text-xl font-bold">
+                  Komunitas Saya
+                </CardTitle>
+                <CardDescription>
+                  Komunitas yang telah Anda ikuti
+                </CardDescription>
+              </div>
+              <Link to="/community">
+                <Button variant="outline" size="sm">
+                  <Plus className="w-4 h-4 mr-2" />
+                  Jelajahi Lebih Banyak
+                </Button>
+              </Link>
+            </div>
           </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              <div className="p-4 border border-gray-200 rounded-lg hover:shadow-md transition-shadow cursor-pointer">
-                <div className="flex items-center space-x-3 mb-3">
-                  <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-500 rounded-lg flex items-center justify-center">
-                    <Users className="w-5 h-5 text-white" />
-                  </div>
-                  <div>
-                    <h3 className="font-semibold">Jakarta Teachers</h3>
-                    <p className="text-sm text-gray-500">245 members</p>
-                  </div>
-                </div>
-                <p className="text-sm text-gray-600 mb-3">
-                  A community for educators in Jakarta to share resources and
-                  collaborate.
-                </p>
-                <Badge variant="outline" className="text-xs">
-                  Active
-                </Badge>
+            {isLoadingCommunities ? (
+              <div className="flex items-center justify-center py-8">
+                <div className="w-6 h-6 border-2 border-blue-600 border-t-transparent rounded-full animate-spin mr-2" />
+                <span className="text-gray-600">Memuat komunitas...</span>
               </div>
-
-              <div className="p-4 border border-gray-200 rounded-lg hover:shadow-md transition-shadow cursor-pointer">
-                <div className="flex items-center space-x-3 mb-3">
-                  <div className="w-10 h-10 bg-gradient-to-r from-green-500 to-blue-500 rounded-lg flex items-center justify-center">
-                    <BookOpen className="w-5 h-5 text-white" />
-                  </div>
-                  <div>
-                    <h3 className="font-semibold">Math Enthusiasts</h3>
-                    <p className="text-sm text-gray-500">89 members</p>
-                  </div>
+            ) : joinedCommunities.length === 0 ? (
+              <div className="text-center py-8">
+                <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <Users className="w-8 h-8 text-gray-400" />
                 </div>
-                <p className="text-sm text-gray-600 mb-3">
-                  Sharing innovative math teaching methods and resources.
+                <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                  Belum Bergabung dengan Komunitas
+                </h3>
+                <p className="text-gray-600 mb-4">
+                  Mulai bergabung dengan komunitas untuk terhubung dengan
+                  pendidik lain.
                 </p>
-                <Badge variant="outline" className="text-xs">
-                  Active
-                </Badge>
+                <Link to="/community">
+                  <Button className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700">
+                    <UserPlus className="w-4 h-4 mr-2" />
+                    Jelajahi Komunitas
+                  </Button>
+                </Link>
               </div>
-
-              <div className="p-4 border border-gray-200 rounded-lg hover:shadow-md transition-shadow cursor-pointer">
-                <div className="flex items-center space-x-3 mb-3">
-                  <div className="w-10 h-10 bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg flex items-center justify-center">
-                    <Users className="w-5 h-5 text-white" />
-                  </div>
-                  <div>
-                    <h3 className="font-semibold">Language Learning</h3>
-                    <p className="text-sm text-gray-500">156 members</p>
-                  </div>
-                </div>
-                <p className="text-sm text-gray-600 mb-3">
-                  Supporting multilingual education across Indonesia.
-                </p>
-                <Badge variant="outline" className="text-xs">
-                  Active
-                </Badge>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {joinedCommunities.map((community) => (
+                  <CommunityCard key={community.id} community={community} />
+                ))}
               </div>
-            </div>
+            )}
           </CardContent>
         </Card>
       </main>
