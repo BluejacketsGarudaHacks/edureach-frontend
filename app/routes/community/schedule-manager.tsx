@@ -107,7 +107,7 @@ export default function ScheduleManager({ communityId }: I) {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Calendar className="h-5 w-5" />
-                Create New Schedule
+                Buat Jadwal Baru
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -137,7 +137,7 @@ export default function ScheduleManager({ communityId }: I) {
                   </div>
                 </div>
                 <Button type="submit" className="w-full">
-                  Create Schedule
+                  Buat Jadwal
                 </Button>
               </form>
             </CardContent>
@@ -147,13 +147,13 @@ export default function ScheduleManager({ communityId }: I) {
         {/* Schedule List */}
         <div className="space-y-4">
           <h3 className="text-lg font-semibold">
-            Community Schedules ({schedules.length})
+            Jadwal Komunitas ({schedules.length})
           </h3>
 
           {schedules.length === 0 ? (
             <Card>
               <CardContent className="py-8 text-center text-muted-foreground">
-                No schedules created yet. Create your first schedule!
+                Belum ada jadwal.
               </CardContent>
             </Card>
           ) : (
@@ -177,14 +177,16 @@ export default function ScheduleManager({ communityId }: I) {
                           </div>
                         </div>
                       </div>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => handleDelete(schedule.id)}
-                        className="text-destructive hover:text-destructive hover:bg-destructive/10"
-                      >
-                        <Trash2 />
-                      </Button>
+                      {user?.isVolunteer && (
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => handleDelete(schedule.id)}
+                          className="text-destructive hover:text-destructive hover:bg-destructive/10"
+                        >
+                          <Trash2 />
+                        </Button>
+                      )}
                     </div>
                   </CardContent>
                 </Card>

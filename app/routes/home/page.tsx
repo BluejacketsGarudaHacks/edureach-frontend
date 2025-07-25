@@ -102,6 +102,11 @@ export default function HomePage() {
     setIsLoadingCommunities(true);
     getUserCommunities(token, user.id)
       .then((communities) => {
+        communities.forEach((community) => {
+          community.volunteers = community.members.filter(
+            (member) => member.user.isVolunteer
+          );
+        });
         if (communities) {
           setJoinedCommunities(communities);
         }
@@ -126,7 +131,7 @@ export default function HomePage() {
             src={
               community.imagePath
                 ? `${import.meta.env.VITE_BACKEND_URL}${community.imagePath}`
-                : "/placeholder.svg?height=48&width=48"
+                : ""
             }
             alt={community.name}
           />
@@ -169,15 +174,17 @@ export default function HomePage() {
               </div>
             </div>
 
-            <Button
-              size="sm"
-              variant="outline"
-              onClick={() => handleViewCommunityDetail(community.id)}
-              className="text-xs"
-            >
-              <Eye className="w-3 h-3 mr-1" />
-              Lihat Detail
-            </Button>
+            <Link to={"/community/" + community.id}>
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => handleViewCommunityDetail(community.id)}
+                className="text-xs"
+              >
+                <Eye className="w-3 h-3 mr-1" />
+                Lihat Detail
+              </Button>
+            </Link>
           </div>
         </div>
       </div>
@@ -207,7 +214,7 @@ export default function HomePage() {
               </Button>
               <Link to="/profile">
                 <Avatar className="w-8 h-8">
-                  <AvatarImage src={profilePicture || "/placeholder.svg"} />
+                  <AvatarImage src={profilePicture || ""} />
                   <AvatarFallback>{avatarFallback}</AvatarFallback>
                 </Avatar>
               </Link>
