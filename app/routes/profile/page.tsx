@@ -45,11 +45,10 @@ import {
 import { useAuthGuard } from "~/lib/auth-middleware";
 
 export async function clientLoader() {
-
   const token = window.localStorage.getItem("token")
-    if (!token){
-      return null
-    }
+  if (!token){
+    return null
+  }
   const product = await getCurrentUser(token)
   return product;
 }

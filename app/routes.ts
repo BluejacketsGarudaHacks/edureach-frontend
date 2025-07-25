@@ -16,4 +16,5 @@ export default [
     route("/profile", "routes/profile/page.tsx"),
     route("/community", "routes/community-list/page.tsx"),
     route("/summarizer", "routes/summarizer/page.tsx"),
+    route("/notification", "routes/notification/page.tsx")
 ] satisfies RouteConfig;
