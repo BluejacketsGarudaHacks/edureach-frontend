@@ -2,7 +2,6 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 import type { ReactNode } from 'react';
 import type { User } from '~/interfaces/user';
 import { authUtils } from '~/lib/auth-middleware';
-import { getUserProfile } from '~/api/user';
 
 interface UserContextType {
   user: User | null;
@@ -31,27 +30,12 @@ export function UserProvider({ children }: UserProviderProps) {
       if (savedUser && token) {
         try {
           setUser(JSON.parse(savedUser));
-          setLoading(false);
         } catch (error) {
           console.error('Error parsing saved user:', error);
           localStorage.removeItem('user');
-          setLoading(false);
         }
-      } else if (token && !savedUser) {
-        getUserProfile(token)
-          .then((userData) => {
-            setUser(userData);
-            setLoading(false);
-          })
-          .catch((error) => {
-            console.error('Failed to fetch user profile:', error);
-            // Token might be invalid, clear it
-            localStorage.removeItem('token');
-            setLoading(false);
-          });
-      } else {
-        setLoading(false);
       }
+      setLoading(false);
     }
   }, []);
 
