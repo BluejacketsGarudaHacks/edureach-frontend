@@ -16,63 +16,173 @@ import {
   FileText,
   Plus,
   UserPlus,
-  BookOpen,
   Bell,
   Settings,
   LogOut,
+  MapPin,
+  UserCheck,
+  Eye,
 } from "lucide-react";
 import Logo from "~/components/logo";
 import { Link } from "react-router";
 import { useEffect, useState } from "react";
-import { getCurrentUser } from "./api";
-import type { Route } from "./+types/page";
+import { getCurrentUser, getUserCommunities } from "./api";
 import { useAuthGuard } from "~/lib/auth-middleware";
 import { useUser } from "~/hooks/useUser";
+import type { Community } from "~/interfaces/community";
 
 export default function HomePage() {
-  useEffect(() => {
-    window.document.title = "Home | EduReach";
-  }, []);
-
   const { isAuthenticated, logout: authLogout } = useAuthGuard();
   const { user, setUser, clearUser } = useUser();
   const [profilePicture, setProfilePicture] = useState("");
   const [avatarFallback, setAvatarFallback] = useState("XX");
+  const [joinedCommunities, setJoinedCommunities] = useState<Community[]>([]);
+  const [isLoadingCommunities, setIsLoadingCommunities] = useState(true);
+
+  useEffect(() => {
+    window.document.title = "Home | EduReach";
+  }, []);
 
   const logout = () => {
     clearUser();
     authLogout();
   };
 
-  if (!isAuthenticated()) {
-    return null;
-  }
-
   useEffect(() => {
+    // Only fetch user data once when component mounts if user is not already loaded
+    if (user) return; // User already exists, no need to fetch
+
+    const authStatus = isAuthenticated();
+    if (!authStatus) return;
+
     const token = localStorage.getItem("token");
-    if (token) {
-      getCurrentUser(token).then((user) => {
-        if (user) {
-          console.log(user);
-          setUser(user);
-          setProfilePicture(
-            user.imagePath !== ""
-              ? `${import.meta.env.VITE_BACKEND_URL}${user.imagePath}`
-              : ""
-          );
-          setAvatarFallback(
-            user.fullName
-              ? user.fullName
-                  .split(" ")
-                  .map((n) => n[0])
-                  .join("")
-              : "XX"
-          );
-        } else {
+    if (!token) return;
+
+    getCurrentUser(token)
+      .then((fetchedUser) => {
+        if (fetchedUser) {
+          setUser(fetchedUser);
         }
+      })
+      .catch((error) => {
+        console.error("Error fetching user:", error);
       });
+  }, []); // Empty dependency array - only run once on mount
+
+  // Separate effect for updating profile picture and avatar fallback when user changes
+  useEffect(() => {
+    setProfilePicture(
+      user?.imagePath !== ""
+        ? `${import.meta.env.VITE_BACKEND_URL}${user?.imagePath}`
+        : ""
+    );
+    setAvatarFallback(
+      user?.fullName
+        ? user.fullName
+            .split(" ")
+            .map((n) => n[0])
+            .join("")
+        : "XX"
+    );
+  }, [user]);
+
+  // Separate effect for fetching communities when user is available
+  useEffect(() => {
+    if (!user?.id) {
+      setIsLoadingCommunities(false);
+      return;
     }
-  }, []);
+
+    const token = localStorage.getItem("token");
+    if (!token) {
+      setIsLoadingCommunities(false);
+      return;
+    }
+
+    setIsLoadingCommunities(true);
+    getUserCommunities(token, user.id)
+      .then((communities) => {
+        if (communities) {
+          setJoinedCommunities(communities);
+        }
+        setIsLoadingCommunities(false);
+      })
+      .catch((error) => {
+        console.error("Error fetching communities:", error);
+        setIsLoadingCommunities(false);
+      });
+  }, [user?.id]); // Only depend on user ID
+
+  const handleViewCommunityDetail = (communityId: string) => {
+    // Navigate to community detail page
+    console.log("Navigate to community detail:", communityId);
+  };
+
+  const CommunityCard = ({ community }: { community: Community }) => (
+    <div className="p-4 border border-gray-200 rounded-lg hover:shadow-md transition-shadow cursor-pointer">
+      <div className="flex items-start space-x-3 mb-3">
+        <Avatar className="w-12 h-12 flex-shrink-0">
+          <AvatarImage
+            src={
+              community.imagePath
+                ? `${import.meta.env.VITE_BACKEND_URL}${community.imagePath}`
+                : "/placeholder.svg?height=48&width=48"
+            }
+            alt={community.name}
+          />
+          <AvatarFallback className="bg-gradient-to-r from-blue-500 to-purple-500 text-white">
+            {community.name
+              .split(" ")
+              .map((n) => n[0])
+              .join("")
+              .substring(0, 2)}
+          </AvatarFallback>
+        </Avatar>
+        <div className="flex-1 min-w-0">
+          <div className="flex items-start justify-between mb-2">
+            <div className="flex-1">
+              <h3 className="font-semibold text-gray-900 line-clamp-1">
+                {community.name}
+              </h3>
+              <div className="flex items-center text-sm text-gray-500 mt-1">
+                <MapPin className="w-3 h-3 mr-1 flex-shrink-0" />
+                <span className="truncate">
+                  {community.location.city}, {community.location.province}
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <p className="text-sm text-gray-600 line-clamp-2 mb-3">
+            {community.description}
+          </p>
+
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-4 text-sm text-gray-600">
+              <div className="flex items-center">
+                <Users className="w-4 h-4 mr-1" />
+                <span>{community.members.length}</span>
+              </div>
+              <div className="flex items-center">
+                <UserCheck className="w-4 h-4 mr-1" />
+                <span>{community.volunteers.length}</span>
+              </div>
+            </div>
+
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => handleViewCommunityDetail(community.id)}
+              className="text-xs"
+            >
+              <Eye className="w-3 h-3 mr-1" />
+              Lihat Detail
+            </Button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -97,7 +207,7 @@ export default function HomePage() {
               </Button>
               <Link to="/profile">
                 <Avatar className="w-8 h-8">
-                  <AvatarImage src={profilePicture} />
+                  <AvatarImage src={profilePicture || "/placeholder.svg"} />
                   <AvatarFallback>{avatarFallback}</AvatarFallback>
                 </Avatar>
               </Link>
@@ -144,7 +254,9 @@ export default function HomePage() {
                   <p className="text-sm font-medium text-gray-600">
                     Komunitas yang Diikuti
                   </p>
-                  <p className="text-2xl font-bold text-gray-900">3</p>
+                  <p className="text-2xl font-bold text-gray-900">
+                    {joinedCommunities.length}
+                  </p>
                 </div>
                 <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
                   <Users className="w-6 h-6 text-purple-600" />
@@ -228,66 +340,55 @@ export default function HomePage() {
 
         <Card>
           <CardHeader>
-            <CardTitle className="text-xl font-bold">Komunitas Saya</CardTitle>
-            <CardDescription>Komunitas yang telah Anda ikuti</CardDescription>
+            <div className="flex items-center justify-between">
+              <div>
+                <CardTitle className="text-xl font-bold">
+                  Komunitas Saya
+                </CardTitle>
+                <CardDescription>
+                  Komunitas yang telah Anda ikuti
+                </CardDescription>
+              </div>
+              <Link to="/community">
+                <Button variant="outline" size="sm">
+                  <Plus className="w-4 h-4 mr-2" />
+                  Jelajahi Lebih Banyak
+                </Button>
+              </Link>
+            </div>
           </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              <div className="p-4 border border-gray-200 rounded-lg hover:shadow-md transition-shadow cursor-pointer">
-                <div className="flex items-center space-x-3 mb-3">
-                  <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-500 rounded-lg flex items-center justify-center">
-                    <Users className="w-5 h-5 text-white" />
-                  </div>
-                  <div>
-                    <h3 className="font-semibold">Jakarta Teachers</h3>
-                    <p className="text-sm text-gray-500">245 members</p>
-                  </div>
-                </div>
-                <p className="text-sm text-gray-600 mb-3">
-                  A community for educators in Jakarta to share resources and
-                  collaborate.
-                </p>
-                <Badge variant="outline" className="text-xs">
-                  Active
-                </Badge>
+            {isLoadingCommunities ? (
+              <div className="flex items-center justify-center py-8">
+                <div className="w-6 h-6 border-2 border-blue-600 border-t-transparent rounded-full animate-spin mr-2" />
+                <span className="text-gray-600">Memuat komunitas...</span>
               </div>
-
-              <div className="p-4 border border-gray-200 rounded-lg hover:shadow-md transition-shadow cursor-pointer">
-                <div className="flex items-center space-x-3 mb-3">
-                  <div className="w-10 h-10 bg-gradient-to-r from-green-500 to-blue-500 rounded-lg flex items-center justify-center">
-                    <BookOpen className="w-5 h-5 text-white" />
-                  </div>
-                  <div>
-                    <h3 className="font-semibold">Math Enthusiasts</h3>
-                    <p className="text-sm text-gray-500">89 members</p>
-                  </div>
+            ) : joinedCommunities.length === 0 ? (
+              <div className="text-center py-8">
+                <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <Users className="w-8 h-8 text-gray-400" />
                 </div>
-                <p className="text-sm text-gray-600 mb-3">
-                  Sharing innovative math teaching methods and resources.
+                <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                  Belum Bergabung dengan Komunitas
+                </h3>
+                <p className="text-gray-600 mb-4">
+                  Mulai bergabung dengan komunitas untuk terhubung dengan
+                  pendidik lain.
                 </p>
-                <Badge variant="outline" className="text-xs">
-                  Active
-                </Badge>
+                <Link to="/community">
+                  <Button className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700">
+                    <UserPlus className="w-4 h-4 mr-2" />
+                    Jelajahi Komunitas
+                  </Button>
+                </Link>
               </div>
-
-              <div className="p-4 border border-gray-200 rounded-lg hover:shadow-md transition-shadow cursor-pointer">
-                <div className="flex items-center space-x-3 mb-3">
-                  <div className="w-10 h-10 bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg flex items-center justify-center">
-                    <Users className="w-5 h-5 text-white" />
-                  </div>
-                  <div>
-                    <h3 className="font-semibold">Language Learning</h3>
-                    <p className="text-sm text-gray-500">156 members</p>
-                  </div>
-                </div>
-                <p className="text-sm text-gray-600 mb-3">
-                  Supporting multilingual education across Indonesia.
-                </p>
-                <Badge variant="outline" className="text-xs">
-                  Active
-                </Badge>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {joinedCommunities.map((community) => (
+                  <CommunityCard key={community.id} community={community} />
+                ))}
               </div>
-            </div>
+            )}
           </CardContent>
         </Card>
       </main>
