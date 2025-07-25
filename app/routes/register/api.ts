@@ -12,13 +12,15 @@ export const registerInputSchema = z.object({
   dateOfBirth: z.string().refine((val) => !isNaN(Date.parse(val)), {
     message: "Tanggal lahir tidak valid",
   }),
+  isVolunteer: z.boolean()
 }).refine((data) => data.password === data.confirmPassword, {
-  message: "Password tidak sama dengan konfirmasi password",
+  message: "Password tidak sama dengan konfir
   path: ["confirmPassword"],
 });
 
 export type RegisterInput = z.infer<typeof registerInputSchema>;
 
 export const register = async ({data}:{data: RegisterInput}):Promise<string> => {
-    return api.post('user/register', data)
+    console.log(data.isVolunteer)
+    return api.post('user/register', {...data})
 }

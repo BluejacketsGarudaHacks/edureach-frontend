@@ -15,6 +15,7 @@ import { Form, FormControl, FormField, FormItem, FormMessage } from "~/component
 import { toast, Toaster } from "sonner"
 import axios from "axios"
 import { useNavigate } from "react-router"
+import { Checkbox } from "~/components/ui/checkbox"
 
 
 export function RegisterForm() {
@@ -200,12 +201,24 @@ export function RegisterForm() {
                     />
                 </div>
             </div>
-            <div className="flex items-center justify-between text-sm">
-                <label className="flex items-center space-x-2 cursor-pointer">
-                    <input type="checkbox" className="rounded border-gray-300" />
-                    <span className="text-gray-600">Daftar sebagai volunteer</span>
-                </label>
-            </div>
+            
+                <FormField
+                        control={form.control}
+                        name="isVolunteer"
+                        render={({ field }) => (
+                        <FormItem>
+                            <FormControl>
+                                <div className="flex items-center justify-between text-sm">
+                                    <label className="flex items-center space-x-2 cursor-pointer">
+                                        <input type="checkbox" className="rounded border-gray-300" {...field}/>
+                                        <span className="text-gray-600">Daftar sebagai volunteer</span>
+                                    </label>
+                                </div>
+                            </FormControl>
+                            <FormMessage />
+                        </FormItem>
+                        )}
+                    />
 
             <Button
                 type="submit"
