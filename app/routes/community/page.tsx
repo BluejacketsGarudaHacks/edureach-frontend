@@ -10,237 +10,16 @@ import {
   ArrowLeft,
   MapPin,
   Users,
-  Star,
-  Calendar,
-  Clock,
-  MessageCircle,
   UserPlus,
-  Crown,
   Shield,
   User,
-  Video,
-  FileText,
 } from "lucide-react";
 import Loading from "~/components/ui/loading";
-import { api } from "~/util/apiClient";
 import { getCommunity } from "./api";
 import type { Route } from "./+types/page";
-import { Link, NavLink } from "react-router";
 import ScheduleManager from "./schedule-manager";
+import { useAuthGuard } from "~/lib/auth-middleware";
 
-interface CommunityMember {
-  id: string;
-  name: string;
-  role: "creator" | "volunteer" | "member";
-  avatar: string;
-  joinDate: string;
-  contributionScore: number;
-  isOnline: boolean;
-  specialties?: string[];
-  bio?: string;
-}
-
-interface Schedule {
-  id: string;
-  title: string;
-  description: string;
-  volunteerId: string;
-  volunteerName: string;
-  date: string;
-  time: string;
-  duration: string;
-  type: "study_session" | "discussion" | "workshop" | "q_and_a";
-  maxParticipants: number;
-  currentParticipants: number;
-  isRecurring: boolean;
-  meetingLink?: string;
-}
-
-interface CommunityDetail {
-  id: string;
-  name: string;
-  description: string;
-  location: string;
-  image: string;
-  memberCount: number;
-  activeMembers: number;
-  rating: number;
-  category: string;
-  level: string;
-  tags: string[];
-  createdDate: string;
-  rules: string[];
-  members: CommunityMember[];
-  schedules: Schedule[];
-}
-
-// Mock data for demonstration
-const mockCommunityDetail: CommunityDetail = {
-  id: "1",
-  name: "Matematika SMA Jakarta",
-  description:
-    "Komunitas belajar matematika untuk siswa SMA di Jakarta. Kami fokus pada pemahaman konsep dasar hingga persiapan UTBK. Bergabunglah dengan ribuan siswa lainnya untuk belajar bersama, diskusi soal, dan saling membantu dalam perjalanan akademik.",
-  location: "Jakarta",
-  image: "/placeholder.svg?height=400&width=800&text=Matematika+SMA+Jakarta",
-  memberCount: 1250,
-  activeMembers: 89,
-  rating: 4.8,
-  category: "Grup Belajar",
-  level: "SMA",
-  tags: ["UTBK", "Olimpiade", "Kalkulus", "Aljabar", "Geometri"],
-  createdDate: "15 Januari 2023",
-  rules: [
-    "Gunakan bahasa yang sopan dan menghormati sesama anggota",
-    "Fokus pada diskusi matematika dan pembelajaran",
-    "Dilarang spam atau promosi yang tidak relevan",
-    "Bantu sesama anggota dengan memberikan penjelasan yang jelas",
-    "Gunakan fitur pencarian sebelum bertanya hal yang sudah dibahas",
-  ],
-  members: [
-    {
-      id: "1",
-      name: "Pak Budi Santoso",
-      role: "creator",
-      avatar: "/placeholder.svg?height=60&width=60",
-      joinDate: "15 Januari 2023",
-      contributionScore: 2500,
-      isOnline: true,
-      specialties: ["Kalkulus", "Aljabar", "Statistika"],
-      bio: "Guru matematika berpengalaman 20 tahun, lulusan ITB. Senang membantu siswa memahami matematika dengan cara yang mudah.",
-    },
-    {
-      id: "2",
-      name: "Bu Sari Dewi",
-      role: "volunteer",
-      avatar: "/placeholder.svg?height=60&width=60",
-      joinDate: "20 Januari 2023",
-      contributionScore: 1800,
-      isOnline: true,
-      specialties: ["Geometri", "Trigonometri"],
-      bio: "Mahasiswa S2 Matematika UI, aktif mengajar les privat dan bimbel.",
-    },
-    {
-      id: "3",
-      name: "Kak Dimas",
-      role: "volunteer",
-      avatar: "/placeholder.svg?height=60&width=60",
-      joinDate: "25 Januari 2023",
-      contributionScore: 1200,
-      isOnline: false,
-      specialties: ["UTBK", "Olimpiade"],
-      bio: "Alumni OSN Matematika, mahasiswa Teknik ITB. Siap membantu persiapan olimpiade dan UTBK.",
-    },
-    {
-      id: "4",
-      name: "Andi Pratama",
-      role: "member",
-      avatar: "/placeholder.svg?height=60&width=60",
-      joinDate: "1 Februari 2023",
-      contributionScore: 450,
-      isOnline: true,
-      bio: "Siswa SMA kelas 12, sedang persiapan UTBK.",
-    },
-    {
-      id: "5",
-      name: "Sinta Maharani",
-      role: "member",
-      avatar: "/placeholder.svg?height=60&width=60",
-      joinDate: "5 Februari 2023",
-      contributionScore: 320,
-      isOnline: false,
-      bio: "Siswa SMA kelas 11, suka matematika dan ingin ikut olimpiade.",
-    },
-    {
-      id: "6",
-      name: "Rizki Ramadhan",
-      role: "member",
-      avatar: "/placeholder.svg?height=60&width=60",
-      joinDate: "10 Februari 2023",
-      contributionScore: 280,
-      isOnline: true,
-      bio: "Siswa SMA kelas 10, baru mulai belajar matematika tingkat lanjut.",
-    },
-  ],
-  schedules: [
-    {
-      id: "1",
-      title: "Belajar Kalkulus Dasar",
-      description:
-        "Pengenalan konsep limit, turunan, dan integral untuk pemula",
-      volunteerId: "1",
-      volunteerName: "Pak Budi Santoso",
-      date: "2024-01-28",
-      time: "19:00",
-      duration: "90 menit",
-      type: "study_session",
-      maxParticipants: 30,
-      currentParticipants: 18,
-      isRecurring: true,
-      meetingLink: "https://meet.google.com/abc-defg-hij",
-    },
-    {
-      id: "2",
-      title: "Diskusi Soal UTBK Matematika",
-      description:
-        "Pembahasan soal-soal UTBK tahun sebelumnya dan tips mengerjakan",
-      volunteerId: "3",
-      volunteerName: "Kak Dimas",
-      date: "2024-01-29",
-      time: "20:00",
-      duration: "60 menit",
-      type: "discussion",
-      maxParticipants: 25,
-      currentParticipants: 22,
-      isRecurring: false,
-      meetingLink: "https://zoom.us/j/123456789",
-    },
-    {
-      id: "3",
-      title: "Workshop Geometri Ruang",
-      description: "Memahami konsep geometri ruang dengan visualisasi 3D",
-      volunteerId: "2",
-      volunteerName: "Bu Sari Dewi",
-      date: "2024-01-30",
-      time: "16:00",
-      duration: "120 menit",
-      type: "workshop",
-      maxParticipants: 20,
-      currentParticipants: 15,
-      isRecurring: false,
-      meetingLink: "https://meet.google.com/xyz-uvwx-yz",
-    },
-    {
-      id: "4",
-      title: "Sesi Tanya Jawab Mingguan",
-      description:
-        "Sesi terbuka untuk bertanya tentang materi matematika apapun",
-      volunteerId: "1",
-      volunteerName: "Pak Budi Santoso",
-      date: "2024-01-31",
-      time: "18:30",
-      duration: "45 menit",
-      type: "q_and_a",
-      maxParticipants: 50,
-      currentParticipants: 12,
-      isRecurring: true,
-    },
-    {
-      id: "5",
-      title: "Persiapan Olimpiade Matematika",
-      description: "Latihan soal olimpiade tingkat kabupaten dan provinsi",
-      volunteerId: "3",
-      volunteerName: "Kak Dimas",
-      date: "2024-02-01",
-      time: "19:30",
-      duration: "90 menit",
-      type: "study_session",
-      maxParticipants: 15,
-      currentParticipants: 8,
-      isRecurring: true,
-      meetingLink: "https://meet.google.com/olim-piad-math",
-    },
-  ],
-};
 
 export const clientLoader = async ({ params }: Route.ClientLoaderArgs) => {
   let token = localStorage.getItem("token");
@@ -264,6 +43,12 @@ export default function CommunityDetailPage({
 }: Route.ComponentProps) {
   const community = loaderData;
   const [activeTab, setActiveTab] = useState("overview");
+  const { isAuthenticated } = useAuthGuard();
+  
+
+  if (!isAuthenticated()) {
+    return null;
+  }
 
   if (!community) return null;
 
@@ -314,11 +99,6 @@ export default function CommunityDetailPage({
                   EduReach
                 </span>
               </div>
-            </div>
-            <div className="flex items-center space-x-4">
-              <Button variant="outline" size="sm" asChild>
-                <a href="/auth">Masuk</a>
-              </Button>
             </div>
           </div>
         </div>
