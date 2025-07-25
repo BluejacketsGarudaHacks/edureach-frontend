@@ -444,7 +444,7 @@ export default function EditProfilePage({loaderData}:Route.ComponentProps) {
                       {/* Current Password */}
                       <div className="space-y-2">
                         <Label htmlFor="currentPassword">
-                          Password aaat ini*
+                          Password saat ini*
                         </Label>
                         <div className="relative">
                           <Input
