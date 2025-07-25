@@ -37,6 +37,7 @@ import {
 } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
 import { NavLink, useNavigate } from "react-router";
+import getSummarizedPDF from "./api";
 
 function useTiptapEditor(): Editor | null {
   const editor = useEditor({
@@ -61,18 +62,18 @@ export default function SummarizerPage() {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
   const [progress, setProgress] = useState(0);
-  const [selectedLanguage, setSelectedLanguage] = useState("id");
+  const [selectedLanguage, setSelectedLanguage] = useState("indonesia");
   const navigate = useNavigate();
 
   const languageOptions = [
-    { value: "id", label: "Indonesia" },
-    { value: "ban", label: "Bali" },
-    { value: "jw", label: "Jawa" },
-    { value: "su", label: "Sunda" },
-    { value: "btx", label: "Batak Karo" },
-    { value: "bts", label: "Batak Simalungun" },
-    { value: "bbc", label: "Batak Toba" },
-    { value: "min", label: "Minang" },
+    { value: "indonesia", label: "Indonesia" },
+    { value: "bali", label: "Bali" },
+    { value: "jawa", label: "Jawa" },
+    { value: "sunda", label: "Sunda" },
+    { value: "batak karo", label: "Batak Karo" },
+    { value: "batak simalungun", label: "Batak Simalungun" },
+    { value: "batak toba", label: "Batak Toba" },
+    { value: "minang", label: "Minang" },
   ];
 
   useEffect(() => {
@@ -89,7 +90,9 @@ export default function SummarizerPage() {
   };
 
   const handleSummarize = async () => {
+    const token = localStorage.getItem("token");
     if (!selectedFile) return;
+    if (token == null) return;
 
     setIsProcessing(true);
     setProgress(0);
@@ -103,8 +106,19 @@ export default function SummarizerPage() {
       { message: "Finalizing...", progress: 100 },
     ];
 
+    var summarization = "";
+
     for (const step of steps) {
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      if (step.message == "Generating summary...") {
+        const result = await getSummarizedPDF(
+          selectedFile,
+          selectedLanguage,
+          token
+        );
+        console.log(result);
+
+        summarization = result.result;
+      } else await new Promise((resolve) => setTimeout(resolve, 600));
       setProgress(step.progress);
     }
 
@@ -152,7 +166,9 @@ export default function SummarizerPage() {
 
     const mockSummary = getLocalizedSummary(selectedLanguage);
 
-    editor?.commands.setContent(mockSummary);
+    editor?.commands.setContent(
+      summarization == "" ? mockSummary : summarization
+    );
     setIsProcessing(false);
   };
 
@@ -334,7 +350,7 @@ export default function SummarizerPage() {
 
           {/* Right Panel - Editor */}
           <div className="lg:col-span-2">
-            <Card className="h-full border-gray-200 shadow-sm">
+            <Card className="h-full border-gray-200 shadow-sm gap-0">
               <CardHeader>
                 <div className="flex items-center justify-between">
                   <div>
@@ -368,8 +384,8 @@ export default function SummarizerPage() {
                   </div>
                 </div>
               </CardHeader>
-              <Separator className="bg-gray-100" />
-              <CardContent className="p-0">
+              <Separator className="bg-gray-100 mt-2" />
+              <CardContent className="p-0 mt-0">
                 <div className="min-h-[500px] bg-white">
                   <EditorContent editor={editor} className="h-full" />
                 </div>
