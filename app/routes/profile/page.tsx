@@ -124,18 +124,18 @@ export default function EditProfilePage({loaderData}:Route.ComponentProps) {
     
     const token = window.localStorage.getItem("token")
     if (!token){
-      toast("Anda tidak diperbolehkan untuk memperbaharui profil anda")
+      toast("Anda tidak diperbolehkan untuk mengubah profil anda")
       return
     }
     try {
       if (currentFile){
         data.image = currentFile
         await updateUser({data, token})
-        toast("Profil berhasil diperbaharui")
+        toast("Profil berhasil diubah")
       }
     } catch (error) {
       if (axios.isAxiosError(error)){
-        toast("Profil gagal diperbaharui")
+        toast("Profil gagal diubah")
         setIsSubmitting(false)
         return
       }
@@ -209,10 +209,10 @@ export default function EditProfilePage({loaderData}:Route.ComponentProps) {
       <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900 mb-2">
-            Edit Profile
+            Ubah Profil
           </h1>
           <p className="text-gray-600">
-            Update your personal information and account settings.
+            Ubah informasi personal dan pengaturan akun.
           </p>
         </div>
 
@@ -236,7 +236,7 @@ export default function EditProfilePage({loaderData}:Route.ComponentProps) {
                   <span>Informasi personal</span>
                 </CardTitle>
                 <CardDescription>
-                  Update your personal details and profile picture.
+                  Perbarui informasi pribadi dan foto profil Anda
                 </CardDescription>
               </CardHeader>
               <CardContent>
@@ -248,7 +248,7 @@ export default function EditProfilePage({loaderData}:Route.ComponentProps) {
                   <div className="space-y-4">
                     <Label className="flex items-center space-x-2">
                       <Camera className="w-4 h-4" />
-                      <span>Profile Picture</span>
+                      <span>Foto Profil</span>
                     </Label>
                     <div className="flex items-center space-x-6">
                       <Avatar className="w-24 h-24">
@@ -271,12 +271,12 @@ export default function EditProfilePage({loaderData}:Route.ComponentProps) {
                           <Button type="button" variant="outline" asChild>
                             <span>
                               <Upload className="w-4 h-4 mr-2" />
-                              Change Picture
+                              Ubah Foto
                             </span>
                           </Button>
                         </Label>
                         <p className="text-sm text-gray-500 mt-2">
-                          JPG, PNG or GIF. Max size 5MB.
+                          JPG, PNG / GIF. Ukuran maksimal 50 MegaByte (MB).
                         </p>
                       </div>
                     </div>
@@ -289,20 +289,20 @@ export default function EditProfilePage({loaderData}:Route.ComponentProps) {
                       className="flex items-center space-x-2"
                     >
                       <User className="w-4 h-4" />
-                      <span>Full Name *</span>
+                      <span>Nama lengkap *</span>
                     </Label>
                     <Input
                       id="fullName"
                       placeholder="Enter your full name"
                       {...registerProfile("fullName", {
-                        required: "Full name is required",
+                        required: "Nama lengkap harus ada",
                         minLength: {
-                          value: 2,
-                          message: "Name must be at least 2 characters",
+                          value: 1,
+                          message: "Nama lengkap minimal 1 karakter",
                         },
                         maxLength: {
                           value: 50,
-                          message: "Name must be less than 50 characters",
+                          message: "Nama lengkap maksimal 50 karakter",
                         },
                       })}
                       className={profileErrors.fullName ? "border-red-500" : ""}
@@ -321,17 +321,17 @@ export default function EditProfilePage({loaderData}:Route.ComponentProps) {
                       className="flex items-center space-x-2"
                     >
                       <Mail className="w-4 h-4" />
-                      <span>Email Address *</span>
+                      <span>Email *</span>
                     </Label>
                     <Input
                       id="email"
                       type="email"
-                      placeholder="Enter your email address"
+                      placeholder="john.doe@edureach.com"
                       {...registerProfile("email", {
-                        required: "Email is required",
+                        required: "Email harus ada",
                         pattern: {
                           value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-                          message: "Invalid email address",
+                          message: "Alamat email tidak sesuai",
                         },
                       })}
                       className={profileErrors.email ? "border-red-500" : ""}
@@ -349,22 +349,22 @@ export default function EditProfilePage({loaderData}:Route.ComponentProps) {
                       className="flex items-center space-x-2"
                     >
                       <Calendar className="w-4 h-4" />
-                      <span>Date of Birth *</span>
+                      <span>Tanggal Lahir *</span>
                     </Label>
                     <Input
                       id="dateOfBirth"
                       type="date"
                       {...registerProfile("dateOfBirth", {
-                        required: "Date of birth is required",
+                        required: "Tanggal lahir harus ada",
                         validate: (value) => {
                           const today = new Date();
                           const birthDate = new Date(value);
                           const age =
                             today.getFullYear() - birthDate.getFullYear();
                           if (age < 13)
-                            return "You must be at least 13 years old";
+                            return "Anda harus minimal berumur 13 tahun";
                           if (age > 120)
-                            return "Please enter a valid date of birth";
+                            return "Umur tidak valid";
                           return true;
                         },
                       })}
@@ -389,12 +389,12 @@ export default function EditProfilePage({loaderData}:Route.ComponentProps) {
                       {isSubmitting ? (
                         <>
                           <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2" />
-                          Updating Profile...
+                          Mengubah Profil...
                         </>
                       ) : (
                         <>
                           <User className="w-4 h-4 mr-2" />
-                          Update Profile
+                          Ubah Profil
                         </>
                       )}
                     </Button>
@@ -408,9 +408,9 @@ export default function EditProfilePage({loaderData}:Route.ComponentProps) {
           <div className="space-y-6">
             <Card>
               <CardHeader>
-                <CardTitle>Security Settings</CardTitle>
+                <CardTitle>Pengaturan Keamanan</CardTitle>
                 <CardDescription>
-                  Manage your account security and password
+                  Kelola keamanan akun dan password
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
@@ -421,15 +421,14 @@ export default function EditProfilePage({loaderData}:Route.ComponentProps) {
                   <DialogTrigger asChild>
                     <Button variant="outline" className="w-full bg-transparent">
                       <Lock className="w-4 h-4 mr-2" />
-                      Change Password
+                      Ganti Password
                     </Button>
                   </DialogTrigger>
                   <DialogContent className="sm:max-w-md">
                     <DialogHeader>
-                      <DialogTitle>Change Password</DialogTitle>
+                      <DialogTitle>Ganti Password</DialogTitle>
                       <DialogDescription>
-                        Enter your current password and choose a new secure
-                        password.
+                        Masukkan password saat ini dan memilih password baru yang aman.
                       </DialogDescription>
                     </DialogHeader>
 
@@ -437,7 +436,7 @@ export default function EditProfilePage({loaderData}:Route.ComponentProps) {
                       <Alert className="border-green-200 bg-green-50">
                         <CheckCircle className="w-4 h-4 text-green-600" />
                         <AlertDescription className="text-green-800">
-                          Password changed successfully!
+                          Password berhasil diganti!
                         </AlertDescription>
                       </Alert>
                     )}
@@ -449,7 +448,7 @@ export default function EditProfilePage({loaderData}:Route.ComponentProps) {
                       {/* Current Password */}
                       <div className="space-y-2">
                         <Label htmlFor="currentPassword">
-                          Current Password *
+                          Password aaat ini*
                         </Label>
                         <div className="relative">
                           <Input
@@ -457,7 +456,7 @@ export default function EditProfilePage({loaderData}:Route.ComponentProps) {
                             type={showCurrentPassword ? "text" : "password"}
                             placeholder="Enter current password"
                             {...registerPassword("currentPassword", {
-                              required: "Current password is required",
+                              required: "Password saat ini harus ada",
                             })}
                             className={
                               passwordErrors.currentPassword
@@ -490,22 +489,22 @@ export default function EditProfilePage({loaderData}:Route.ComponentProps) {
 
                       {/* New Password */}
                       <div className="space-y-2">
-                        <Label htmlFor="newPassword">New Password *</Label>
+                        <Label htmlFor="newPassword">Password baru *</Label>
                         <div className="relative">
                           <Input
                             id="newPassword"
                             type={showNewPassword ? "text" : "password"}
-                            placeholder="Enter new password"
+                            placeholder="Masukkan password baru"
                             {...registerPassword("newPassword", {
-                              required: "New password is required",
+                              required: "Password baru harus ada",
                               minLength: {
                                 value: 8,
                                 message:
-                                  "Password must be at least 8 characters",
+                                  "Password baru minimal 8 karakter",
                               },
                               pattern: {
                                 value: /^(?=.*[A-Za-z])(?=.*\d)(?=.*[^A-Za-z\d])[A-Za-z\d\W_]+$/,
-                                message: "Password must contain alphabet, symbol, and number",
+                                message: "Password harus memiliki huruf, simbol, dan angka",
                               },
                             })}
                             className={
@@ -538,15 +537,15 @@ export default function EditProfilePage({loaderData}:Route.ComponentProps) {
                       {/* Confirm Password */}
                       <div className="space-y-2">
                         <Label htmlFor="confirmPassword">
-                          Confirm New Password *
+                          Konfirmasi Password Baru *
                         </Label>
                         <div className="relative">
                           <Input
                             id="confirmPassword"
                             type={showConfirmPassword ? "text" : "password"}
-                            placeholder="Confirm new password"
+                            placeholder="Konfirmasi Password Baru"
                             {...registerPassword("confirmPassword", {
-                              required: "Please confirm your password",
+                              required: "Tolong konfirmasi password anda",
                             })}
                             className={
                               passwordErrors.confirmPassword
@@ -594,10 +593,10 @@ export default function EditProfilePage({loaderData}:Route.ComponentProps) {
                           {isPasswordSubmitting ? (
                             <>
                               <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2" />
-                              Updating...
+                              Mengganti...
                             </>
                           ) : (
-                            "Update Password"
+                            "Ganti Password"
                           )}
                         </Button>
                       </div>
@@ -606,11 +605,12 @@ export default function EditProfilePage({loaderData}:Route.ComponentProps) {
                 </Dialog>
 
                 <div className="text-sm text-gray-600">
-                  <p className="font-medium mb-2">Password Requirements:</p>
+                  <p className="font-medium mb-2">Syarat Password:</p>
                   <ul className="space-y-1 text-xs">
-                    <li>• At least 8 characters long</li>
-                    <li>• Contains at least one number</li>
-                    <li>• Contains at least one symbol</li>
+                    <li>• Minimal 8 karakter</li>
+                    <li>• Minimal memiliki 1 angka</li>
+                    <li>• Minimal memiliki 1 huruf</li>
+                    <li>• Minimal memiliki 1 simbol</li>
                   </ul>
                 </div>
               </CardContent>
@@ -619,8 +619,8 @@ export default function EditProfilePage({loaderData}:Route.ComponentProps) {
             <Alert>
               <User className="w-4 h-4" />
               <AlertDescription>
-                Your profile information is visible to other community members.
-                Make sure to keep your details up to date.
+                Informasi profile anda terlihat ke anggota komunitas lainnya.
+                Pastikan untuk memastikan profilenya adalah yang terbaru.
               </AlertDescription>
             </Alert>
           </div>
