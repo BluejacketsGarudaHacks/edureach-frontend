@@ -28,7 +28,7 @@ export const updateUser = ({data, token}:{data:updateUserInput, token: string}) 
     const formData = new FormData()
 
     formData.append("FirstName", data.fullName.split(' ')[0])
-    formData.append("LastName", data.fullName.split(' ').length < 2 ? '': data.fullName.split(' ')[1])
+    formData.append("LastName", data.fullName.split(' ').length < 2 ? data.fullName.split(' ')[0]: data.fullName.split(' ')[1])
     formData.append("Dob", data.dateOfBirth)
     formData.append("Email", data.email)
     formData.append("Image", data.image)
