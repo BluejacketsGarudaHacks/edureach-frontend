@@ -1,5 +1,6 @@
 import type { Community } from "~/interfaces/community";
 import type { User } from "~/interfaces/user";
+import type { UserSummary } from "~/interfaces/user-summary";
 import { api } from "~/util/apiClient";
 
 export interface Notification {
@@ -50,6 +51,17 @@ export async function updateNotification(
       Authorization: `Bearer ${token}`,
     },
   });
+}
+
+export const getUserSummary = async (token: string, userId: string): Promise<UserSummary[]> => {
+  if (token == null) return [];
+  if (userId == "") return [];
+
+  return api.get("summarize/user/" + userId, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    }
+  })
 }
 
 export const getUserCommunities = async (token: string, userId: string): Promise<Community[]> => {
