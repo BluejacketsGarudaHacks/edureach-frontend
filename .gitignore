@@ -6,3 +6,4 @@
 /build/
 .env
 package-lock.json
+.vercel
