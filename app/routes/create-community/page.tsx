@@ -1,65 +1,88 @@
-"use client"
+"use client";
 
-import type React from "react"
+import type React from "react";
 
-import { useForm } from "react-hook-form"
-import { useEffect, useState } from "react"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Textarea } from "@/components/ui/textarea"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Alert, AlertDescription } from "@/components/ui/alert"
-import { ArrowLeft, Upload, Users, MapPin, FileText, ImageIcon, CheckCircle } from "lucide-react"
-import { useNavigate } from "react-router"
-import { createCommunity, type createCommunityInput } from "./api"
-import { toast, Toaster } from "sonner"
-import axios from "axios"
-import { useAuthGuard } from "~/lib/auth-middleware"
-import { useEditor } from "@tiptap/react"
-import type { Route } from "./+types/page"
-import type { Location } from "~/interfaces/location"
-import Loading from "~/components/ui/loading"
-
+import { useForm } from "react-hook-form";
+import { useEffect, useState } from "react";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import {
+  ArrowLeft,
+  Upload,
+  Users,
+  MapPin,
+  FileText,
+  ImageIcon,
+  CheckCircle,
+} from "lucide-react";
+import { useNavigate } from "react-router";
+import { createCommunity, type createCommunityInput } from "./api";
+import { toast, Toaster } from "sonner";
+import axios from "axios";
+import { useAuthGuard } from "~/lib/auth-middleware";
+import { useEditor } from "@tiptap/react";
+import type { Route } from "./+types/page";
+import type { Location } from "~/interfaces/location";
+import Loading from "~/components/ui/loading";
 
 export const clientLoader = async () => {
+  let indonesianLocations: Location[] = [];
 
-  let indonesianLocations:Location[] = []
-
-  let token = localStorage.getItem('token')
-  if (!token) return indonesianLocations
+  let token = localStorage.getItem("token");
+  if (!token) return indonesianLocations;
 
   try {
-    let response = await axios.get<Location[]>(`${import.meta.env.VITE_BACKEND_URL}/api/location`, {
-      headers: {
-        Authorization: `Bearer ${token}`
+    let response = await axios.get<Location[]>(
+      `${import.meta.env.VITE_BACKEND_URL}/api/location`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
       }
-    })
-    return response.data
+    );
+    return response.data;
   } catch (error) {
-    return indonesianLocations
+    return indonesianLocations;
   }
-}
+};
 
 export function HydrateFallback() {
   return <Loading />;
 }
 
-export default function CreateCommunityPage({loaderData}:Route.ComponentProps) {
+export default function CreateCommunityPage({
+  loaderData,
+}: Route.ComponentProps) {
   useEffect(() => {
-    window.document.title = "Buat Komunitas | EduReach"
-  }, [])
+    window.document.title = "Buat Komunitas | EduReach";
+  }, []);
 
   const { isAuthenticated } = useAuthGuard();
-  const [isSubmitting, setIsSubmitting] = useState(false)
-  const [isSuccess, setIsSuccess] = useState(false)
-  const [selectedImage, setSelectedImage] = useState<string | null>(null)
-  const [selectedFile, setSelectedFile] = useState<File | null>(null)
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSuccess, setIsSuccess] = useState(false);
+  const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
   const navigate = useNavigate();
 
-  let indonesianLocations = loaderData
+  let indonesianLocations = loaderData;
 
   // Don't render if not authenticated
   if (!isAuthenticated()) {
@@ -73,55 +96,55 @@ export default function CreateCommunityPage({loaderData}:Route.ComponentProps) {
     watch,
     formState: { errors },
     reset,
-  } = useForm<createCommunityInput>()
+  } = useForm<createCommunityInput>();
 
-  const watchedLocation = watch("locationid")
-  const watchedImage = watch("image")
+  const watchedLocation = watch("locationid");
+  const watchedImage = watch("image");
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]
+    const file = e.target.files?.[0];
     if (file) {
-      setSelectedFile(file)
-      const reader = new FileReader()
+      setSelectedFile(file);
+      const reader = new FileReader();
       reader.onload = (e) => {
-        setSelectedImage(e.target?.result as string)
-      }
-      reader.readAsDataURL(file)
+        setSelectedImage(e.target?.result as string);
+      };
+      reader.readAsDataURL(file);
     }
-  }
+  };
 
   const onSubmit = async (data: createCommunityInput) => {
-    setIsSubmitting(true)
-    
-    const token = window.localStorage.getItem("token")
-    if (!token){
-      toast("Anda tidak diperbolehkan untuk mendaftar komunitas")
-      return
+    setIsSubmitting(true);
+
+    const token = window.localStorage.getItem("token");
+    if (!token) {
+      toast("Anda tidak diperbolehkan untuk mendaftar komunitas");
+      return;
     }
     try {
-      data.image = selectedFile!
-      await createCommunity({data, token})
+      data.image = selectedFile!;
+      await createCommunity({ data, token });
     } catch (error) {
-      if (axios.isAxiosError(error)){
-            toast("Pendaftaran komunitas gagal. " + error.message)
-            setIsSubmitting(false)
-            return
-        }
+      if (axios.isAxiosError(error)) {
+        toast("Pendaftaran komunitas gagal. " + error.message);
+        setIsSubmitting(false);
+        return;
+      }
     }
 
-    setIsSubmitting(false)
-    setIsSuccess(true)
+    setIsSubmitting(false);
+    setIsSuccess(true);
 
     setTimeout(() => {
-      setIsSuccess(false)
-      reset()
-      setSelectedImage(null)
-    }, 3000)
-  }
+      setIsSuccess(false);
+      reset();
+      setSelectedImage(null);
+    }, 3000);
+  };
 
   const handleGoBack = () => {
-    navigate("/home")
-  }
+    navigate("/home");
+  };
 
   if (isSuccess) {
     return (
@@ -131,7 +154,9 @@ export default function CreateCommunityPage({loaderData}:Route.ComponentProps) {
             <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
               <CheckCircle className="w-8 h-8 text-green-600" />
             </div>
-            <h2 className="text-2xl font-bold text-gray-900 mb-2">Komunitas berhasil terbuat!</h2>
+            <h2 className="text-2xl font-bold text-gray-900 mb-2">
+              Komunitas berhasil terbuat!
+            </h2>
             <p className="text-gray-600 mb-6">
               Komunitas anda berhasil terbuat dan terbuka untuk diikuti.
             </p>
@@ -141,7 +166,7 @@ export default function CreateCommunityPage({loaderData}:Route.ComponentProps) {
           </CardContent>
         </Card>
       </div>
-    )
+    );
   }
 
   return (
@@ -169,9 +194,12 @@ export default function CreateCommunityPage({loaderData}:Route.ComponentProps) {
       {/* Main Content */}
       <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Membuat komunitas baru</h1>
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">
+            Membuat komunitas baru
+          </h1>
           <p className="text-gray-600">
-            Build a learning community to connect educators and students across Indonesia.
+            Buat sebuah komunitas belajar untuk menghubungkan para pendidik dan
+            siswa di seluruh Indonesia.
           </p>
         </div>
 
@@ -182,79 +210,102 @@ export default function CreateCommunityPage({loaderData}:Route.ComponentProps) {
               <CardHeader>
                 <CardTitle className="flex items-center space-x-2">
                   <Users className="w-5 h-5" />
-                  <span>Community Details</span>
+                  <span>Detail Komunitas</span>
                 </CardTitle>
-                <CardDescription>Fill in the information below to create your educational community.</CardDescription>
+                <CardDescription>
+                  Isi informasi berikut untuk membuat komunitas belajar Anda.
+                </CardDescription>
               </CardHeader>
               <CardContent>
                 <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
                   {/* Community Name */}
                   <div className="space-y-2">
-                    <Label htmlFor="name" className="flex items-center space-x-2">
+                    <Label
+                      htmlFor="name"
+                      className="flex items-center space-x-2"
+                    >
                       <FileText className="w-4 h-4" />
-                      <span>Community Name *</span>
+                      <span>Nama Komunitas *</span>
                     </Label>
                     <Input
                       id="name"
                       placeholder="e.g., Jakarta Math Teachers"
                       {...register("name", {
-                        required: "Community name is required",
+                        required: "Nama komunitas harus diisi",
                         minLength: {
                           value: 3,
-                          message: "Name must be at least 3 characters",
+                          message: "Nama harus terdiri dari minimal 3 karakter",
                         },
                         maxLength: {
                           value: 50,
-                          message: "Name must be less than 50 characters",
+                          message: "Nama harus terdiri dari maksimal 50 karakter",
                         },
                       })}
                       className={errors.name ? "border-red-500" : ""}
                     />
-                    {errors.name && <p className="text-sm text-red-600">{errors.name.message}</p>}
+                    {errors.name && (
+                      <p className="text-sm text-red-600">
+                        {errors.name.message}
+                      </p>
+                    )}
                   </div>
 
                   {/* Description */}
                   <div className="space-y-2">
-                    <Label htmlFor="description" className="flex items-center space-x-2">
+                    <Label
+                      htmlFor="description"
+                      className="flex items-center space-x-2"
+                    >
                       <FileText className="w-4 h-4" />
-                      <span>Description *</span>
+                      <span>Deskripsi *</span>
                     </Label>
                     <Textarea
                       id="description"
-                      placeholder="Describe your community's purpose, goals, and what members can expect..."
+                      placeholder="Deskripsikan tujuan komunitas, target, dan apa saja yang diekspektasi oleh para pelajar.."
                       rows={4}
                       {...register("description", {
-                        required: "Description is required",
+                        required: "Deskripsi harus diisi",
                         minLength: {
                           value: 20,
-                          message: "Description must be at least 20 characters",
+                          message: "Deskripsi harus terdiri dari minimal 20 karakter",
                         },
                         maxLength: {
                           value: 500,
-                          message: "Description must be less than 500 characters",
+                          message:
+                            "Deskripsi harus terdiri dari maksimal 500 karakter",
                         },
                       })}
                       className={errors.description ? "border-red-500" : ""}
                     />
-                    {errors.description && <p className="text-sm text-red-600">{errors.description.message}</p>}
+                    {errors.description && (
+                      <p className="text-sm text-red-600">
+                        {errors.description.message}
+                      </p>
+                    )}
                   </div>
 
                   {/* Location */}
                   <div className="space-y-2">
                     <Label className="flex items-center space-x-2">
                       <MapPin className="w-4 h-4" />
-                      <span>Location *</span>
+                      <span>Lokasi *</span>
                     </Label>
-                    <Select onValueChange={(value) => setValue("locationid", value)}>
-                      <SelectTrigger className={errors.locationid ? "border-red-500" : ""}>
-                        <SelectValue placeholder="Select a city in Indonesia" />
+                    <Select
+                      onValueChange={(value) => setValue("locationid", value)}
+                    >
+                      <SelectTrigger
+                        className={errors.locationid ? "border-red-500" : ""}
+                      >
+                        <SelectValue placeholder="Pilih sebuah kota di Indonesia" />
                       </SelectTrigger>
                       <SelectContent>
-                        {indonesianLocations.sort((a,b) => a.city.localeCompare(b.city)).map((loc) => (
-                          <SelectItem key={loc.id} value={loc.id}>
-                            {loc.city}
-                          </SelectItem>
-                        ))}
+                        {indonesianLocations
+                          .sort((a, b) => a.city.localeCompare(b.city))
+                          .map((loc) => (
+                            <SelectItem key={loc.id} value={loc.id}>
+                              {loc.city}
+                            </SelectItem>
+                          ))}
                       </SelectContent>
                     </Select>
                     <input
@@ -263,14 +314,21 @@ export default function CreateCommunityPage({loaderData}:Route.ComponentProps) {
                         required: "Please select a location",
                       })}
                     />
-                    {errors.locationid && <p className="text-sm text-red-600">{errors.locationid.message}</p>}
+                    {errors.locationid && (
+                      <p className="text-sm text-red-600">
+                        {errors.locationid.message}
+                      </p>
+                    )}
                   </div>
 
                   {/* Image Upload */}
                   <div className="space-y-2">
-                    <Label htmlFor="image" className="flex items-center space-x-2">
+                    <Label
+                      htmlFor="image"
+                      className="flex items-center space-x-2"
+                    >
                       <ImageIcon className="w-4 h-4" />
-                      <span>Community Image</span>
+                      <span>Gambar Komunitas</span>
                     </Label>
                     <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-gray-400 transition-colors">
                       <input
@@ -289,14 +347,20 @@ export default function CreateCommunityPage({loaderData}:Route.ComponentProps) {
                               alt="Preview"
                               className="w-32 h-32 object-cover rounded-lg mx-auto"
                             />
-                            <p className="text-sm text-gray-600">Click to change image</p>
+                            <p className="text-sm text-gray-600">
+                              Klik untuk mengganti gambar
+                            </p>
                           </div>
                         ) : (
                           <div className="flex items-center gap-5 space-y-2">
                             <Upload className="w-8 h-8 text-gray-400 mx-auto m-0" />
-                            <div>
-                              <p className="text-sm font-medium text-gray-900">Click to upload an image</p>
-                              <p className="text-sm text-gray-500">PNG, JPG, GIF up to 10MB</p>
+                            <div className="text-left">
+                              <p className="text-sm font-medium text-gray-900">
+                                Klik untuk menggungah gambar
+                              </p>
+                              <p className="text-sm text-gray-500">
+                                PNG, JPG, GIF up to 10MB
+                              </p>
                             </div>
                           </div>
                         )}
@@ -319,7 +383,7 @@ export default function CreateCommunityPage({loaderData}:Route.ComponentProps) {
                       ) : (
                         <>
                           <Users className="w-4 h-4 mr-2" />
-                          Create Community
+                          Buat Komunitas
                         </>
                       )}
                     </Button>
@@ -334,7 +398,9 @@ export default function CreateCommunityPage({loaderData}:Route.ComponentProps) {
             <Card>
               <CardHeader>
                 <CardTitle>Preview</CardTitle>
-                <CardDescription>This is how your community will appear to others</CardDescription>
+                <CardDescription>
+                  Komunitas akan terlihat seperti ini ke orang lain
+                </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="aspect-video bg-gray-100 rounded-lg flex items-center justify-center overflow-hidden">
@@ -352,13 +418,17 @@ export default function CreateCommunityPage({loaderData}:Route.ComponentProps) {
                   )}
                 </div>
                 <div>
-                  <h3 className="font-semibold text-gray-900">{watch("name") || "Community Name"}</h3>
+                  <h3 className="font-semibold text-gray-900">
+                    {watch("name") || "Nama Komunitas"}
+                  </h3>
                   <p className="text-sm text-gray-500 flex items-center mt-1">
                     <MapPin className="w-3 h-3 mr-1" />
-                    {indonesianLocations.find(e => e.id == watchedLocation)?.city || "Location"}
+                    {indonesianLocations.find((e) => e.id == watchedLocation)
+                      ?.city || "Lokasi"}
                   </p>
                   <p className="text-sm text-gray-600 mt-2">
-                    {watch("description") || "Community description will appear here..."}
+                    {watch("description") ||
+                      "Deskripsi komunitas akan muncul di sini..."}
                   </p>
                 </div>
               </CardContent>
@@ -367,13 +437,12 @@ export default function CreateCommunityPage({loaderData}:Route.ComponentProps) {
             <Alert>
               <Users className="w-4 h-4" />
               <AlertDescription>
-                Once created, your community will be visible to all EduReach users. You'll become the community
-                administrator and can manage members and content.
+                Setelah dibuat, komunitas Anda akan terlihat ke semua pengguna EduReach.
               </AlertDescription>
             </Alert>
           </div>
         </div>
       </main>
     </div>
-  )
+  );
 }
