@@ -221,7 +221,7 @@ export default function CommunityDetailPage({
                           <div className="flex-1 min-w-0">
                             <div className="flex items-center space-x-2 mb-1">
                               {getRoleIcon(member.user.isVolunteer)}
-                              <h3 className="font-semibold text-sm truncate border">
+                              <h3 className="font-semibold text-sm truncate">
                                 {member.user.email}
                               </h3>
                             </div>

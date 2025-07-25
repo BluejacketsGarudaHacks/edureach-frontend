@@ -267,18 +267,15 @@ export default function HomePage() {
                 <Bell className="w-5 h-5" />
               </Button>
             </Link>
-              <Button variant="ghost" size="icon">
-                <Settings className="w-5 h-5" />
-              </Button>
-              <Link to="/profile">
-                <Avatar className="w-8 h-8">
-                  <AvatarImage src={profilePicture || ""} />
-                  <AvatarFallback>{avatarFallback}</AvatarFallback>
-                </Avatar>
-              </Link>
-              <Button variant="ghost" size="icon" onClick={logout}>
-                <LogOut className="w-5 h-5" />
-              </Button>
+            <Link to="/profile">
+              <Avatar className="w-8 h-8">
+                <AvatarImage src={profilePicture || ""} />
+                <AvatarFallback>{avatarFallback}</AvatarFallback>
+              </Avatar>
+            </Link>
+            <Button variant="ghost" size="icon" onClick={logout}>
+              <LogOut className="w-5 h-5" />
+            </Button>
             </div>
           </div>
         </div>
