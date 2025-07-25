@@ -217,9 +217,11 @@ export default function HomePage() {
             </div>
 
             <div className="flex items-center space-x-4">
+            <Link to="/notification">
               <Button variant="ghost" size="icon">
                 <Bell className="w-5 h-5" />
               </Button>
+            </Link>
               <Button variant="ghost" size="icon">
                 <Settings className="w-5 h-5" />
               </Button>
